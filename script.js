@@ -24,3 +24,16 @@ const displayController = (() => {
   }
 
 })();
+
+const Player = (name, mark) => {
+  const getName = () => name;
+  const getMark = () => mark;
+
+  return {
+    getName,
+    getMark
+  }
+}
+
+const player1 = Player('P1', 'X');
+const player2 = Player('P2', 'O');
