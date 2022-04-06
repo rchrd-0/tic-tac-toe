@@ -1,19 +1,18 @@
 const gameBoard = (() => {
-  let board = ['0', '1', '2', '3', '4', '5', '6', '7', '8'];
+  const board = new Array(9).fill(null);
 
   const getBoard = () => [...board];
 
   return {
     getBoard
   }
-  
 })();
 
 const displayController = (() => {
   const gameTiles = document.querySelectorAll('.game-tile');
-  const marks = gameBoard.getBoard();
 
   const renderBoard = () => {
+    const marks = gameBoard.getBoard();
     for (let i = 0; i < gameTiles.length; i++) {
       gameTiles[i].textContent = marks[i];
     }
@@ -22,18 +21,22 @@ const displayController = (() => {
   return {
     renderBoard
   }
-
 })();
 
-const Player = (name, mark) => {
-  const getName = () => name;
-  const getMark = () => mark;
+const gameController = (() => {
+  const Player = (name, mark, turn) => {
+    return {
+      name,
+      mark,
+      turn
+    }
+  };
+  const p1 = Player('Player 1', 'X', true);
+  const p2 = Player('Player 2', 'O', false);
 
-  return {
-    getName,
-    getMark
+  const getActivePlayer = () => (p1.turn) ? p1 : p2;
+  const toggleTurn = () => {
+    p1.turn = !p1.turn;
+    p2.turn = !p2.turn;
   }
-}
-
-const player1 = Player('P1', 'X');
-const player2 = Player('P2', 'O');
+})();
