@@ -2,9 +2,14 @@ const gameBoard = (() => {
   const board = new Array(9).fill(null);
 
   const getBoard = () => [...board];
+  // const placeMark = (index, mark) => {
+  //   board[index] = mark;
+  //   displayController.renderBoard();
+  // }
 
   return {
     getBoard
+    // placeMark
   }
 })();
 
@@ -17,6 +22,16 @@ const displayController = (() => {
       gameTiles[i].textContent = marks[i];
     }
   }
+
+  const getTile = (e) => {
+    let targetTile = e.target;
+    let tileNum = targetTile.dataset.tileNum;
+    if (targetTile.textContent === undefined) {
+      gameController.playMove(tileNum);
+    }
+  }
+
+  gameTiles.forEach(tile => tile.addEventListener('click', getTile))
 
   return {
     renderBoard
@@ -35,8 +50,16 @@ const gameController = (() => {
   const p2 = Player('Player 2', 'O', false);
 
   const getActivePlayer = () => (p1.turn) ? p1 : p2;
+  const playMove = (tile) => {
+    let mark = getActivePlayer().mark;
+    gameBoard.placeMark(tile, mark);
+    toggleTurn();
+  }
   const toggleTurn = () => {
     p1.turn = !p1.turn;
     p2.turn = !p2.turn;
+  }
+  return {
+    playMove
   }
 })();
