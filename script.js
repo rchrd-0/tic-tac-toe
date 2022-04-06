@@ -2,14 +2,14 @@ const gameBoard = (() => {
   const board = new Array(9).fill(null);
 
   const getBoard = () => [...board];
-  // const placeMark = (index, mark) => {
-  //   board[index] = mark;
-  //   displayController.renderBoard();
-  // }
+  const placeMark = (index, mark) => {
+    board[index] = mark;
+    displayController.renderBoard();
+  }
 
   return {
-    getBoard
-    // placeMark
+    getBoard,
+    placeMark
   }
 })();
 
@@ -26,7 +26,7 @@ const displayController = (() => {
   const getTile = (e) => {
     let targetTile = e.target;
     let tileNum = targetTile.dataset.tileNum;
-    if (targetTile.textContent === undefined) {
+    if (!targetTile.textContent) {
       gameController.playMove(tileNum);
     }
   }
