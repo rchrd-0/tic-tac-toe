@@ -7,8 +7,16 @@ const gameBoard = (() => {
     displayController.renderBoard();
   }
 
+  const getCount = () => {
+    return {
+      X: board.filter(mark => mark == 'X').length,
+      O: board.filter(mark => mark == 'O').length,
+    }
+  }
+
   return {
     getBoard,
+    getCount,
     placeMark
   }
 })();
@@ -22,7 +30,6 @@ const displayController = (() => {
       gameTiles[i].textContent = marks[i];
     }
   }
-
   const getTile = (e) => {
     let targetTile = e.target;
     let tileNum = targetTile.dataset.tileNum;
@@ -59,7 +66,9 @@ const gameController = (() => {
     p1.turn = !p1.turn;
     p2.turn = !p2.turn;
   }
+
   return {
     playMove
   }
 })();
+
