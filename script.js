@@ -7,16 +7,8 @@ const gameBoard = (() => {
     displayController.renderBoard();
   }
 
-  const getMarkCount = () => {
-    return {
-      X: board.filter(mark => mark == 'X').length,
-      O: board.filter(mark => mark == 'O').length,
-    }
-  }
-
   return {
     getBoard,
-    getMarkCount,
     placeMark
   }
 })();
@@ -60,13 +52,9 @@ const gameController = (() => {
   const playMove = (tile) => {
     let mark = getActivePlayer().mark;
     gameBoard.placeMark(tile, mark);
-
-    let markCount = gameBoard.getMarkCount();
-    checkWin(markCount);
-
-    toggleTurn();
+    checkWin();
   }
-  const checkWin = (markCount) => {
+  const checkWin = () => {
     const board = gameBoard.getBoard();
     const winConditions = [
       [0, 1, 2],
@@ -78,10 +66,44 @@ const gameController = (() => {
       [0, 4, 8],
       [2, 4, 6]
     ]
-    const checkWinFor = Object.keys(markCount)
-      .filter(player => markCount[player] >= 3);
 
-    
+    const getWinner = (() => {
+      const markCount = {
+        X: board.filter(mark => mark === 'X').length,
+        O: board.filter(mark => mark === 'O').length
+      }
+      const checkWinFor = Object.keys(markCount)
+        .filter(player => markCount[player] >= 3);
+
+      return (function() {
+        let winner = {}
+        checkWinFor.forEach(player => {
+          let indices = [];
+          for (let i = 0; i < board.length; i++) {
+            if (board[i] === player) {
+              indices.push(i);
+            }
+          }
+
+          winConditions.forEach(condition => {
+            if (condition.every(index => indices.includes(index))) {
+              Object.assign(winner, {
+                player: player,
+                condition: [...condition]
+              })
+            }
+          })
+        })
+
+        return winner
+      })();
+    })();
+
+    if (Object.keys(getWinner).length === 0) {
+      toggleTurn();
+    } else {
+      // End game
+    }    
   }
   const toggleTurn = () => {
     p1.turn = !p1.turn;
