@@ -68,12 +68,13 @@ const gameController = (() => {
     ]
 
     const getWinner = (() => {
-      const markCount = {
-        X: board.filter(mark => mark === 'X').length,
-        O: board.filter(mark => mark === 'O').length
+      const players = {
+        p1: Object.assign({...p1}, {count: board.filter(mark => mark === p1.mark).length}),
+        p2: Object.assign({...p2}, {count: board.filter(mark => mark === p2.mark).length})
       }
-      const checkWinFor = Object.keys(markCount)
-        .filter(player => markCount[player] >= 3);
+      const checkWinFor = Object.keys(players)
+        .filter(p => players[p].count >= 3)
+        .map(p => players[p].mark);
 
       return (function() {
         let winner = {}
@@ -99,11 +100,21 @@ const gameController = (() => {
       })();
     })();
 
-    if (Object.keys(getWinner).length === 0) {
-      toggleTurn();
+    const endGame = () => {
+      if (!board.includes(null)) {
+        console.log('Draw');
+      } else {
+        let player = (getWinner.player === p1.mark) ? p1.name : p2.name;
+        console.log(`${player} wins!`);
+      }
+    }
+
+    if (Object.keys(getWinner).length === 0 && board.includes(null)) {
+      toggleTurn()
     } else {
-      // End game
-    }    
+      endGame();
+    }
+
   }
   const toggleTurn = () => {
     p1.turn = !p1.turn;
@@ -111,7 +122,10 @@ const gameController = (() => {
   }
 
   return {
-    playMove
+    p1,
+    p2,
+    playMove,
+    getActivePlayer
   }
 })();
 
