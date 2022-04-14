@@ -24,6 +24,10 @@ const gameController = (() => {
   const p1 = Player('Player 1', 'X', true);
   const p2 = Player('Player 2', 'O', false);
 
+  let ongoingGame = true;
+  const isGameOngoing = () => {
+    return ongoingGame;
+  }
   const getActivePlayer = () => (p1.turn) ? p1 : p2;
   const playMove = (tile) => {
     let mark = getActivePlayer().mark;
@@ -80,16 +84,14 @@ const gameController = (() => {
       })();
     })();
 
-    (getWinner) ? endGame(getWinner) : toggleTurn();
+    (!getWinner && board.includes(null)) ? toggleTurn() : endGame(getWinner);
   }
-
   const endGame = (winner) => {
-    ongoingGame = !ongoingGame;
-  }
-
-  let ongoingGame = true;
-  const isGameOngoing = () => {
-    return ongoingGame;
+    if (!winner) {
+      console.log('Draw')
+    } else {
+      console.log('Win')
+    }
   }
   const toggleTurn = () => {
     p1.turn = !p1.turn;
