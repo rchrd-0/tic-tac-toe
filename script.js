@@ -53,6 +53,7 @@ const gameController = (() => {
     let mark = getActivePlayer().mark;
     gameBoard.placeMark(tile, mark);
     checkWin();
+    toggleTurn();
   }
   const checkWin = () => {
     const board = gameBoard.getBoard();
@@ -75,45 +76,51 @@ const gameController = (() => {
       const checkWinFor = Object.keys(players)
         .filter(p => players[p].count >= 3)
         .map(p => players[p].mark);
+      // Array [X, O] if number of marks >= 3
 
       return (function() {
-        let winner = {}
-        checkWinFor.forEach(player => {
+        let winningRow = {}
+        checkWinFor.forEach(mark => {
           let indices = [];
           for (let i = 0; i < board.length; i++) {
-            if (board[i] === player) {
+            if (board[i] === mark) {
               indices.push(i);
             }
           }
+          // [0, 1, 2] array index nums of each mark >= 3
 
           winConditions.forEach(condition => {
             if (condition.every(index => indices.includes(index))) {
-              Object.assign(winner, {
-                player: player,
-                condition: [...condition]
+              Object.assign(winningRow, {
+                mark: mark,
+                row: [...condition]
               })
             }
           })
         })
+        
+        let winner = Object.keys(players)
+          .filter (p => players[p].mark === winningRow.mark);
+        winner = Object.assign({...players[winner]}, {row: winningRow.row});
 
-        return winner
+        return winner;
       })();
     })();
 
-    const endGame = () => {
-      if (!board.includes(null)) {
-        console.log('Draw');
-      } else {
-        let player = (getWinner.player === p1.mark) ? p1.name : p2.name;
-        console.log(`${player} wins!`);
-      }
-    }
+    // const endGame = () => {
+    //   if (!board.includes(null)) {
+    //     console.log('Draw');
+    //   } else {
+    //     let player = (getWinner.player === p1.mark) ? p1.name : p2.name;
+    //     console.log(`${player} wins!`);
+    //   }
+    // }
 
-    if (Object.keys(getWinner).length === 0 && board.includes(null)) {
-      toggleTurn()
-    } else {
-      endGame();
-    }
+    // if (Object.keys(getWinner).length === 0 && board.includes(null)) {
+    //   toggleTurn()
+    // } else {
+    //   endGame();
+    // }
 
   }
   const toggleTurn = () => {
@@ -122,10 +129,7 @@ const gameController = (() => {
   }
 
   return {
-    p1,
-    p2,
     playMove,
-    getActivePlayer
   }
 })();
 
