@@ -24,10 +24,6 @@ const gameController = (() => {
   const p1 = Player('Player 1', 'X', true);
   const p2 = Player('Player 2', 'O', false);
 
-  let ongoingGame = true;
-  const isGameOngoing = () => {
-    return ongoingGame;
-  }
   const getActivePlayer = () => (p1.turn) ? p1 : p2;
   const playMove = (tile) => {
     let mark = getActivePlayer().mark;
@@ -83,14 +79,16 @@ const gameController = (() => {
         }
       })();
     })();
-
-    (!getWinner && board.includes(null)) ? toggleTurn() : endGame(getWinner);
-  }
-  const endGame = (winner) => {
-    if (!winner) {
-      console.log('Draw')
+    console.log(getWinner);
+    
+    if (!getWinner) {
+      if (board.includes(null)) {
+        toggleTurn();
+      } else {
+        console.log('Draw');
+      }
     } else {
-      console.log('Win')
+      console.log('Win');
     }
   }
   const toggleTurn = () => {
@@ -99,8 +97,7 @@ const gameController = (() => {
   }
 
   return {
-    playMove,
-    isGameOngoing
+    playMove
   }
 })();
 
@@ -119,15 +116,20 @@ const displayController = (() => {
     if (!targetTile.textContent) {
       gameController.playMove(tileNum);
     }
-
-    if (!gameController.isGameOngoing()) {
-      gameTiles.forEach(tile => tile.removeEventListener('click', getTile))
-    }
   }
+  // const gameOver = (state, playerObj = {}) => {
+  //   gameTiles.forEach(tile => tile.removeEventListener('click', getTile));
+  //   if (state === 'draw') {
+  //     console.log('Draw');
+  //   } else {
+  //     console.log(`${playerObj.name} wins!`);
+  //   }
+  // }
   gameTiles.forEach(tile => tile.addEventListener('click', getTile))
 
   return {
     renderBoard,
+    // gameOver
   }
 })();
 
