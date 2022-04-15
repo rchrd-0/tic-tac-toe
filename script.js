@@ -64,7 +64,7 @@ const gameController = (() => {
             if (condition.every(index => indices.includes(index))) {
               Object.assign(winningRow, {
                 mark: mark,
-                row: [...condition]
+                row: [...condition].map(String)
               })
             } 
           })
@@ -79,16 +79,15 @@ const gameController = (() => {
         }
       })();
     })();
-    console.log(getWinner);
     
     if (!getWinner) {
       if (board.includes(null)) {
         toggleTurn();
       } else {
-        console.log('Draw');
+        displayController.gameOver('draw');
       }
     } else {
-      console.log('Win');
+      displayController.gameOver('win', {...getWinner});
     }
   }
   const toggleTurn = () => {
@@ -117,19 +116,23 @@ const displayController = (() => {
       gameController.playMove(tileNum);
     }
   }
-  // const gameOver = (state, playerObj = {}) => {
-  //   gameTiles.forEach(tile => tile.removeEventListener('click', getTile));
-  //   if (state === 'draw') {
-  //     console.log('Draw');
-  //   } else {
-  //     console.log(`${playerObj.name} wins!`);
-  //   }
-  // }
+
+  const gameOver = (state, winner = {}) => {
+    gameTiles.forEach(tile => tile.removeEventListener('click', getTile));
+    if (state === 'draw') {
+      console.log('Draw');
+    } else {
+      console.log(`${winner.name} wins!`);
+      const winningRow = [...gameTiles].filter(tile => winner.row
+        .includes(tile.dataset.tileNum))
+      winningRow.forEach(tile => tile.style.color = 'red');
+    }
+  }
   gameTiles.forEach(tile => tile.addEventListener('click', getTile))
 
   return {
     renderBoard,
-    // gameOver
+    gameOver
   }
 })();
 
