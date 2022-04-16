@@ -10,15 +10,21 @@ const Player = (name, mark) => {
 const gameBoard = (() => {
   const board = new Array(9).fill(null);
 
+  const clearBoard = () => board.fill(null);
   const getBoard = () => [...board];
   const placeMark = (index, mark) => {
     board[index] = mark;
+    displayController.renderBoard();
+  }
+  const resetBoard = () => {
+    clearBoard();
     displayController.renderBoard();
   }
 
   return {
     getBoard,
     placeMark,
+    resetBoard
   }
 })();
 
@@ -31,6 +37,8 @@ const gameController = (() => {
   const p1 = CurrentPlayer('Player 1', 'X', true);
   const p2 = CurrentPlayer('Player 2', 'O', false);
 
+  const toggleTurn = (...players) => players.forEach(p => p.turn = !p.turn);
+  const resetTurns = (...players) => players.forEach(p => p.turn = p.getInitialTurn());
   const playMove = (tile) => {
     let activePlayer = (p1.turn) ? p1 : p2;
     let mark = activePlayer.getMark();
@@ -54,7 +62,7 @@ const gameController = (() => {
         p1: Object.assign({...p1}, {count: board.filter(mark => mark === p1.getMark()).length}),
         p2: Object.assign({...p2}, {count: board.filter(mark => mark === p2.getMark()).length})
       }
-      const checkWinFor = Object.keys(players)
+      let checkWinFor = Object.keys(players)
         .filter(p => players[p].count >= 3)
         .map(p => players[p].getMark());
 
@@ -70,9 +78,11 @@ const gameController = (() => {
           winConditions.forEach(condition => {
             if (condition.every(index => indices.includes(index))) {
               Object.assign(winningRow, {mark}, {row: [...condition].map(String)})
+              // String conversion to map with data attributes
             } 
           })
         })
+
         if (Object.keys(winningRow).length > 0) {
           let winner = Object.keys(players)
             .filter (p => players[p].getMark() === winningRow.mark);
@@ -85,31 +95,36 @@ const gameController = (() => {
 
     if (getWinner || !board.includes(null)) {
       if (getWinner) {
-        displayController.gameOver('win', {...getWinner});
+        displayController.endGame('win', {...getWinner});
       } else {
-        displayController.gameOver('draw');
+        displayController.endGame('draw');
       }
     } else {
       toggleTurn(p1, p2)
     }
   }
-  const toggleTurn = (...players) => {
-    players.forEach(p => p.turn = !p.turn);
+  const resetGame = () => {
+    resetTurns(p1, p2);
+    gameBoard.resetBoard();
   }
 
   return {
     playMove,
+    resetGame
   }
 })();
 
 const displayController = (() => {
   const gameTiles = document.querySelectorAll('.game-tile');
+  const restartButton = document.querySelector('#restart-button');
 
   const renderBoard = () => {
     const board = gameBoard.getBoard();
     for (let i = 0; i < gameTiles.length; i++) {
       gameTiles[i].textContent = board[i];
     }
+    restartButton.textContent = 'Restart game';
+    gameTiles.forEach(tile => tile.addEventListener('click', getTile))
   }
   const getTile = (e) => {
     let targetTile = e.target;
@@ -118,22 +133,30 @@ const displayController = (() => {
       gameController.playMove(tileNum);
     }
   }
-
-  const gameOver = (state, winner = {}) => {
+  const endGame = (state, winner = {}) => {
     gameTiles.forEach(tile => tile.removeEventListener('click', getTile));
-    if (state === 'draw') {
-      console.log('Draw');
-    } else {
-      console.log(`${winner.getName()} wins!`);
-      const winningRow = [...gameTiles].filter(tile => winner.row
-        .includes(tile.dataset.tileNum))
-      winningRow.forEach(tile => tile.style.color = 'red');
+    restartButton.textContent = 'New game';
+    switch (state) {
+      case 'draw': 
+      // gameTiles.forEach(tile => tile.style.color = 'gray');
+        console.log('Draw');
+        break;
+      case 'win':
+        console.log(`${winner.getName()} wins!`);
+        // const winningRow = [...gameTiles].filter(tile => winner.row
+        //   .includes(tile.dataset.tileNum))
+        // winningRow.forEach(tile => tile.style.color = 'red');
+        break;
     }
   }
-  gameTiles.forEach(tile => tile.addEventListener('click', getTile))
+  const restartGame = () => gameController.resetGame();
+
+  restartButton.addEventListener('click', restartGame);
 
   return {
     renderBoard,
-    gameOver
+    endGame
   }
 })();
+
+window.addEventListener('load', displayController.renderBoard)
