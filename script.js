@@ -1,3 +1,12 @@
+const Player = (name, mark) => {
+  const getName = () => name;
+  const getMark = () => mark;
+  return {
+    getName,
+    getMark
+  }
+}
+
 const gameBoard = (() => {
   const board = new Array(9).fill(null);
 
@@ -9,24 +18,22 @@ const gameBoard = (() => {
 
   return {
     getBoard,
-    placeMark
+    placeMark,
   }
 })();
 
 const gameController = (() => {
-  const Player = (name, mark, turn) => {
-    return {
-      name,
-      mark,
-      turn
-    }
+  const CurrentPlayer = (name, mark, turn) => {
+    const prototype = Player(name, mark);
+    const getInitialTurn = () => turn;
+    return Object.assign({}, prototype, {getInitialTurn}, {turn});
   }
-  const p1 = Player('Player 1', 'X', true);
-  const p2 = Player('Player 2', 'O', false);
+  const p1 = CurrentPlayer('Player 1', 'X', true);
+  const p2 = CurrentPlayer('Player 2', 'O', false);
 
-  const getActivePlayer = () => (p1.turn) ? p1 : p2;
   const playMove = (tile) => {
-    let mark = getActivePlayer().mark;
+    let activePlayer = (p1.turn) ? p1 : p2;
+    let mark = activePlayer.getMark();
     gameBoard.placeMark(tile, mark);
     checkWin();
   }
@@ -44,12 +51,12 @@ const gameController = (() => {
     ]
     const getWinner = (() => {
       const players = {
-        p1: Object.assign({...p1}, {count: board.filter(mark => mark === p1.mark).length}),
-        p2: Object.assign({...p2}, {count: board.filter(mark => mark === p2.mark).length})
+        p1: Object.assign({...p1}, {count: board.filter(mark => mark === p1.getMark()).length}),
+        p2: Object.assign({...p2}, {count: board.filter(mark => mark === p2.getMark()).length})
       }
       const checkWinFor = Object.keys(players)
         .filter(p => players[p].count >= 3)
-        .map(p => players[p].mark);
+        .map(p => players[p].getMark());
 
       return (function() {
         let winningRow = {}
@@ -62,41 +69,36 @@ const gameController = (() => {
           }
           winConditions.forEach(condition => {
             if (condition.every(index => indices.includes(index))) {
-              Object.assign(winningRow, {
-                mark: mark,
-                row: [...condition].map(String)
-              })
+              Object.assign(winningRow, {mark}, {row: [...condition].map(String)})
             } 
           })
         })
-
         if (Object.keys(winningRow).length > 0) {
           let winner = Object.keys(players)
-            .filter (p => players[p].mark === winningRow.mark);
+            .filter (p => players[p].getMark() === winningRow.mark);
           winner = Object.assign({...players[winner]}, {row: winningRow.row});
           
           return winner
         }
       })();
     })();
-    
-    if (!getWinner) {
-      if (board.includes(null)) {
-        toggleTurn();
+
+    if (getWinner || !board.includes(null)) {
+      if (getWinner) {
+        displayController.gameOver('win', {...getWinner});
       } else {
         displayController.gameOver('draw');
       }
     } else {
-      displayController.gameOver('win', {...getWinner});
+      toggleTurn(p1, p2)
     }
   }
-  const toggleTurn = () => {
-    p1.turn = !p1.turn;
-    p2.turn = !p2.turn;
+  const toggleTurn = (...players) => {
+    players.forEach(p => p.turn = !p.turn);
   }
 
   return {
-    playMove
+    playMove,
   }
 })();
 
@@ -122,7 +124,7 @@ const displayController = (() => {
     if (state === 'draw') {
       console.log('Draw');
     } else {
-      console.log(`${winner.name} wins!`);
+      console.log(`${winner.getName()} wins!`);
       const winningRow = [...gameTiles].filter(tile => winner.row
         .includes(tile.dataset.tileNum))
       winningRow.forEach(tile => tile.style.color = 'red');
@@ -135,4 +137,3 @@ const displayController = (() => {
     gameOver
   }
 })();
-
