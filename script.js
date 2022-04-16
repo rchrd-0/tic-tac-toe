@@ -118,13 +118,15 @@ const displayController = (() => {
   const gameTiles = document.querySelectorAll('.game-tile');
   const restartButton = document.querySelector('#restart-button');
 
+  const initInterface = () => {
+    restartButton.textContent = 'Restart game';
+    gameTiles.forEach(tile => tile.addEventListener('click', getTile));
+  }
   const renderBoard = () => {
     const board = gameBoard.getBoard();
     for (let i = 0; i < gameTiles.length; i++) {
       gameTiles[i].textContent = board[i];
     }
-    restartButton.textContent = 'Restart game';
-    gameTiles.forEach(tile => tile.addEventListener('click', getTile))
   }
   const getTile = (e) => {
     let targetTile = e.target;
@@ -149,14 +151,18 @@ const displayController = (() => {
         break;
     }
   }
-  const restartGame = () => gameController.resetGame();
+  const restartGame = () => {
+    initInterface();
+    gameController.resetGame();
+  }
 
   restartButton.addEventListener('click', restartGame);
 
   return {
+    initInterface,
     renderBoard,
     endGame
   }
 })();
 
-window.addEventListener('load', displayController.renderBoard)
+window.addEventListener('load', displayController.initInterface)
