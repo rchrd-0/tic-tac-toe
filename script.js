@@ -78,7 +78,7 @@ const gameController = (() => {
           winConditions.forEach(condition => {
             if (condition.every(index => indices.includes(index))) {
               Object.assign(winningRow, {mark}, {row: [...condition].map(String)})
-              // String conversion to map with data attributes
+              // String conversion to map data attributes
             } 
           })
         })
@@ -117,8 +117,10 @@ const gameController = (() => {
 const displayController = (() => {
   const gameTiles = document.querySelectorAll('.game-tile');
   const restartButton = document.querySelector('#restart-button');
+  const gameResult = document.querySelector('#game-result');
 
   const initInterface = () => {
+    gameResult.textContent = '';
     restartButton.textContent = 'Restart game';
     gameTiles.forEach(tile => tile.addEventListener('click', getTile));
   }
@@ -140,14 +142,10 @@ const displayController = (() => {
     restartButton.textContent = 'New game';
     switch (state) {
       case 'draw': 
-      // gameTiles.forEach(tile => tile.style.color = 'gray');
-        console.log('Draw');
+        gameResult.textContent = 'It\'s a draw'
         break;
       case 'win':
-        console.log(`${winner.getName()} wins!`);
-        // const winningRow = [...gameTiles].filter(tile => winner.row
-        //   .includes(tile.dataset.tileNum))
-        // winningRow.forEach(tile => tile.style.color = 'red');
+        gameResult.textContent = `${winner.getName()} wins!`;
         break;
     }
   }
