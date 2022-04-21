@@ -10,6 +10,17 @@
 </head>
 <body>
   <div class="main">
+    <div class="user-interface" id="ui-top">
+      <div class="players" id="player1">
+        <span id="player1-name">Player 1</span>
+        <span id="player1-mark">X</span>
+      </div>
+      <div class="players" id="player2">
+        <span id="player2-name">Player 2</span>
+        <span id="player2-mark">O</span>
+      </div>
+      <div id="game-result"></div>
+    </div>
     <div id="game-board">
       <div class="game-tile" data-tile-num="0"></div>
       <div class="game-tile" data-tile-num="1"></div>
@@ -21,9 +32,8 @@
       <div class="game-tile" data-tile-num="7"></div>
       <div class="game-tile" data-tile-num="8"></div>
     </div>
-    <div class="user-interface">
-      <div id="game-result"></div>
-      <button id="restart-button"></button>
+    <div class="user-interface" id="ui-bottom">
+      <button class="game-btn" id="restart"></button>
     </div>
   </div>
 </body>

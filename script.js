@@ -116,12 +116,12 @@ const gameController = (() => {
 
 const displayController = (() => {
   const gameTiles = document.querySelectorAll('.game-tile');
-  const restartButton = document.querySelector('#restart-button');
+  const restartButton = document.querySelector('#restart');
   const gameResult = document.querySelector('#game-result');
 
   const initInterface = () => {
     gameResult.textContent = '';
-    restartButton.textContent = 'Restart game';
+    restartButton.textContent = 'Restart';
     gameTiles.forEach(tile => tile.addEventListener('click', getTile));
   }
   const renderBoard = () => {
@@ -135,11 +135,11 @@ const displayController = (() => {
     let tileNum = targetTile.dataset.tileNum;
     if (!targetTile.textContent) {
       gameController.playMove(tileNum);
-    }
+    } 
   }
   const endGame = (state, winner = {}) => {
     gameTiles.forEach(tile => tile.removeEventListener('click', getTile));
-    restartButton.textContent = 'New game';
+    restartButton.textContent = 'Play again';
     switch (state) {
       case 'draw': 
         gameResult.textContent = 'It\'s a draw'

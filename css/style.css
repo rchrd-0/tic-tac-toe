@@ -1,6 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&display=swap');
+
 html,
 body,
-div {
+div,
+span {
   margin: 0;
   padding: 0;
   border: 0;
@@ -17,18 +20,77 @@ html {
   box-sizing: inherit;
 }
 
+body {
+  font-family: 'Jost', Helvetica, Arial, sans-serif;
+}
+
+.main {
+  width: 500px;
+  margin: 50px auto;
+  /* border: 1px solid black; */
+  display: flex;
+  gap: 10px;
+  flex-direction: column;
+  align-items: center;
+}
+
+.user-interface {
+  display: flex;
+  width: 100%;
+  font-size: 1.3rem;
+}
+
+#ui-top {
+  width: 100%;
+  flex-flow: row wrap;
+  justify-content: space-between;
+}
+
+#game-result {
+  height: 30px;
+  margin-top: 10px;
+  flex-basis: 100%;
+  font-size: 1.4rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.players {
+  padding: 5px 12px;
+  border-radius: 12px;
+  width: 45%;
+  display: flex;
+  border: 1px solid black;
+  justify-content: space-between;
+}
+
+#ui-bottom {
+  justify-content: center;
+}
 
 #game-board {
   display: grid;
   grid-template-columns: repeat(3, 100px);
   grid-template-rows: repeat(3, 100px);
-  gap: 10px;
+  gap: 6px;
 }
 
 .game-tile {
-  border: 2px solid black;
+  user-select: none;
+  border-radius: 8px;
+  border: 1px solid black;
   font-size: 2rem;
   line-height: 100px;
   text-align: center;
   vertical-align: middle;
+}
+
+.game-btn {
+  font-family: inherit;
+  font-size: 1.2rem;
+  border-radius: 8px;
+  background-color: #fff;
+  border: 1px solid black;
+  padding: 4px 10px;
 }
