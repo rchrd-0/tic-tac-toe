@@ -46,7 +46,7 @@ body {
   justify-content: space-between;
 }
 
-#game-result {
+#game-message {
   height: 30px;
   margin-top: 10px;
   flex-basis: 100%;

@@ -39,9 +39,10 @@ const gameController = (() => {
 
   const toggleTurn = (...players) => players.forEach(p => p.turn = !p.turn);
   const resetTurns = (...players) => players.forEach(p => p.turn = p.getInitialTurn());
+  const getActivePlayer = () => (p1.turn) ? p1 : p2;
   const playMove = (tile) => {
-    let activePlayer = (p1.turn) ? p1 : p2;
-    let mark = activePlayer.getMark();
+    let mark = getActivePlayer()
+      .getMark();
     gameBoard.placeMark(tile, mark);
     checkWin();
   }
@@ -101,6 +102,9 @@ const gameController = (() => {
       }
     } else {
       toggleTurn(p1, p2)
+      let name = getActivePlayer()
+        .getName();
+      displayController.updateMessage(`${name}\'s turn`);
     }
   }
   const resetGame = () => {
@@ -117,10 +121,10 @@ const gameController = (() => {
 const displayController = (() => {
   const gameTiles = document.querySelectorAll('.game-tile');
   const restartButton = document.querySelector('#restart');
-  const gameResult = document.querySelector('#game-result');
+  const gameMessage = document.querySelector('#game-message');
 
   const initInterface = () => {
-    gameResult.textContent = '';
+    gameMessage.textContent = 'Player 1\'s turn';
     restartButton.textContent = 'Restart';
     gameTiles.forEach(tile => tile.addEventListener('click', getTile));
   }
@@ -137,15 +141,17 @@ const displayController = (() => {
       gameController.playMove(tileNum);
     } 
   }
+  const updateMessage = (message) => gameMessage.textContent = message;
+
   const endGame = (state, winner = {}) => {
     gameTiles.forEach(tile => tile.removeEventListener('click', getTile));
     restartButton.textContent = 'Play again';
     switch (state) {
       case 'draw': 
-        gameResult.textContent = 'It\'s a draw'
+        updateMessage('It\'s a draw ...')
         break;
       case 'win':
-        gameResult.textContent = `${winner.getName()} wins!`;
+        updateMessage(`${winner.getName()} wins!`);
         break;
     }
   }
@@ -159,6 +165,7 @@ const displayController = (() => {
   return {
     initInterface,
     renderBoard,
+    updateMessage,
     endGame
   }
 })();
