@@ -37,9 +37,15 @@ const gameController = (() => {
   const p1 = CurrentPlayer('Player 1', 'X', true);
   const p2 = CurrentPlayer('Player 2', 'O', false);
 
-  const toggleTurn = (...players) => players.forEach(p => p.turn = !p.turn);
+  const toggleTurn = (...players) => {
+    players.forEach(p => p.turn = !p.turn)
+    let name = getActivePlayer()
+        .getName();
+    displayController.updateMessage(`${name}\'s turn`);
+  }
   const resetTurns = (...players) => players.forEach(p => p.turn = p.getInitialTurn());
   const getActivePlayer = () => (p1.turn) ? p1 : p2;
+  const activePlayerName = getActivePlayer().getName();
   const playMove = (tile) => {
     let mark = getActivePlayer()
       .getMark();
@@ -95,16 +101,10 @@ const gameController = (() => {
     })();
 
     if (getWinner || !board.includes(null)) {
-      if (getWinner) {
-        displayController.endGame('win', {...getWinner});
-      } else {
-        displayController.endGame('draw');
-      }
+      let result = (getWinner) ? {...getWinner} : {};
+      displayController.endGame(result);
     } else {
       toggleTurn(p1, p2)
-      let name = getActivePlayer()
-        .getName();
-      displayController.updateMessage(`${name}\'s turn`);
     }
   }
   const resetGame = () => {
@@ -113,6 +113,7 @@ const gameController = (() => {
   }
 
   return {
+    getActivePlayer,
     playMove,
     resetGame
   }
@@ -124,10 +125,14 @@ const displayController = (() => {
   const gameMessage = document.querySelector('#game-message');
 
   const initInterface = () => {
-    gameMessage.textContent = 'Player 1\'s turn';
+    let activePlayer = gameController.getActivePlayer()
+      .getName();
+    gameMessage.textContent = `${activePlayer}\'s turn`;
     restartButton.textContent = 'Restart';
     gameTiles.forEach(tile => tile.addEventListener('click', getTile));
+    gameTiles.forEach(tile => tile.classList.remove('winning-row'));
   }
+  
   const renderBoard = () => {
     const board = gameBoard.getBoard();
     for (let i = 0; i < gameTiles.length; i++) {
@@ -142,19 +147,18 @@ const displayController = (() => {
     } 
   }
   const updateMessage = (message) => gameMessage.textContent = message;
-
-  const endGame = (state, winner = {}) => {
+  const endGame = (player = {}) => {
     gameTiles.forEach(tile => tile.removeEventListener('click', getTile));
     restartButton.textContent = 'Play again';
-    switch (state) {
-      case 'draw': 
-        updateMessage('It\'s a draw ...')
-        break;
-      case 'win':
-        updateMessage(`${winner.getName()} wins!`);
-        break;
+    if (Object.keys(player).length > 0) {
+      updateMessage(`${player.getName()} wins!`);
+      [...gameTiles].filter(tile => player.row.includes(tile.dataset.tileNum))
+        .forEach(tile => tile.classList.add('winning-row'));
+    } else {
+      updateMessage('It\'s a draw ...');
     }
   }
+
   const restartGame = () => {
     initInterface();
     gameController.resetGame();
