@@ -114,7 +114,7 @@ const gameController = (() => {
   return {
     getActivePlayer,
     playMove,
-    resetGame
+    resetGame,
   }
 })();
 
@@ -124,9 +124,9 @@ const displayController = (() => {
   const gameMessage = document.querySelector('#game-message');
 
   const initInterface = () => {
-    let activePlayer = gameController.getActivePlayer()
+    let startingPlayer = gameController.getActivePlayer()
       .getName();
-    gameMessage.textContent = `${activePlayer}\'s turn`;
+    gameMessage.textContent = `${startingPlayer}\'s turn`;
     restartButton.textContent = 'Restart';
     gameTiles.forEach(tile => tile.addEventListener('click', getTile));
     gameTiles.forEach(tile => tile.classList.remove('winning-row'));
@@ -157,10 +157,9 @@ const displayController = (() => {
       updateMessage('It\'s a draw ...');
     }
   }
-
   const restartGame = () => {
-    initInterface();
     gameController.resetGame();
+    initInterface();
   }
 
   restartButton.addEventListener('click', restartGame);
