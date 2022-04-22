@@ -37,6 +37,7 @@ const gameController = (() => {
   const p1 = CurrentPlayer('Player 1', 'X', true);
   const p2 = CurrentPlayer('Player 2', 'O', false);
 
+  const getActivePlayer = () => (p1.turn) ? {...p1} : {...p2};
   const toggleTurn = (...players) => {
     players.forEach(p => p.turn = !p.turn)
     let name = getActivePlayer()
@@ -44,8 +45,6 @@ const gameController = (() => {
     displayController.updateMessage(`${name}\'s turn`);
   }
   const resetTurns = (...players) => players.forEach(p => p.turn = p.getInitialTurn());
-  const getActivePlayer = () => (p1.turn) ? p1 : p2;
-  const activePlayerName = getActivePlayer().getName();
   const playMove = (tile) => {
     let mark = getActivePlayer()
       .getMark();
