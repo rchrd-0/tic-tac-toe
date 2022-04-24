@@ -1,43 +1,46 @@
-const Player = (playerNum, mark) => {
-  const getPlayerNum = () => playerNum;
-  const getMark = () => mark;
-  return {
-    getPlayerNum,
-    getMark
-  }
-}
-
 const players = (() => {
-    const CurrentPlayer = (playerNum, mark, turn) => {
-      const prototype = Player(playerNum, mark);
-      const getInitialTurn = () => turn;
-      const getUsername = () => usernames[playerNum - 1];
-      return Object.assign({}, prototype, {getInitialTurn}, {getUsername}, {turn});
-    }
-    const usernamesDefault = {
-      0: 'Player 1',
-      1: 'Player 2'
-    }
-    let usernames = Object.assign({}, usernamesDefault);
-    const p1 = CurrentPlayer(1, 'X', true);
-    const p2 = CurrentPlayer(2, 'O', false);
-    const getP1 = () => {return {...p1}};
-    const getP2 = () => {return {...p2}};
-    const setNames = (names) => {
-      for (let i = 0; i < names.length; i++) {
-        if (names[i] === '') {
-          names[i] = usernamesDefault[i];
-        }
-      }
-      usernames = Object.assign({}, {...names});
-    }
-    
+  const Player = (playerNum, mark, turn) => {
+    const getPlayerNum = () => playerNum;
+    const getMark = () => mark;
+    const getInitialTurn = () => turn;
+    const getUsername = () => usernames[playerNum - 1];
+  
     return {
-      setNames,
-      getP1,
-      getP2
+      getPlayerNum,
+      getMark,
+      getInitialTurn,
+      getUsername,
+      turn
+    };
+  };
+  const usernamesDefault = {
+    0: 'Player 1',
+    1: 'Player 2'
+  };
+  let usernames = Object.assign({}, usernamesDefault);
+  const p1 = Player(1, 'X', true);
+  const p2 = Player(2, 'O', false);
+  const getP1 = () => {
+    return {...p1}
+  }
+  const getP2 = () => {
+    return {...p2}
+  }
+  const setNames = (names) => {
+    for (let i = 0; i < names.length; i++) {
+      if (names[i] === '') {
+        names[i] = usernamesDefault[i];
+      }
     }
-  })();
+    usernames = Object.assign({}, {...names});
+  }
+    
+  return {
+    setNames,
+    getP1,
+    getP2
+  }
+})();
 
 const gameBoard = (() => {
   const board = new Array(9).fill(null);
@@ -66,14 +69,12 @@ const gameController = (() => {
   const getActivePlayer = () => (p1.turn) ? {...p1} : {...p2};
   const toggleTurn = (...players) => {
     players.forEach(p => p.turn = !p.turn)
-    let name = getActivePlayer()
-        .getUsername();
+    let name = getActivePlayer().getUsername();
     displayController.updateMessage(`${name}\'s turn`);
   }
   const resetTurns = (...players) => players.forEach(p => p.turn = p.getInitialTurn());
   const playMove = (tile) => {
-    let mark = getActivePlayer()
-      .getMark();
+    let mark = getActivePlayer().getMark();
     gameBoard.placeMark(tile, mark);
     checkWin();
   }
@@ -117,7 +118,7 @@ const gameController = (() => {
 
         if (Object.keys(winningRow).length > 0) {
           let winner = Object.keys(players)
-            .filter (p => players[p].getMark() === winningRow.mark);
+            .filter(p => players[p].getMark() === winningRow.mark);
           winner = Object.assign({...players[winner]}, {row: winningRow.row});
           
           return winner
@@ -158,22 +159,17 @@ const displayController = (() => {
     displayController.renderInterface();
     inputNames.classList.add('hidden');
   }
-
   const renderInterface = () => {
     const displayUsernames = document.querySelectorAll('.card-username');
+    const startingPlayer = gameController.getActivePlayer().getUsername();
     
-    displayUsernames[0].textContent = players.getP1()
-      .getUsername();
-    displayUsernames[1].textContent = players.getP2()
-      .getUsername();
-    let startingPlayer = gameController.getActivePlayer()
-      .getUsername();
+    displayUsernames[0].textContent = players.getP1().getUsername();
+    displayUsernames[1].textContent = players.getP2().getUsername();
     gameMessage.textContent = `${startingPlayer}\'s turn`;
     restartButton.textContent = 'Restart';
     gameTiles.forEach(tile => tile.addEventListener('click', getTile));
     gameTiles.forEach(tile => tile.className = 'game-tile');
   }
-  
   const renderBoard = () => {
     const board = gameBoard.getBoard();
     for (let i = 0; i < gameTiles.length; i++) {
