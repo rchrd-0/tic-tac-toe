@@ -24,7 +24,11 @@ body {
   font-family: 'Jost', Helvetica, Arial, sans-serif;
 }
 
-.main {
+.hidden {
+  display: none;
+}
+
+.game {
   width: 500px;
   margin: 50px auto;
   /* border: 1px solid black; */
@@ -95,6 +99,17 @@ body {
   padding: 4px 10px;
 }
 
-.winning-row {
+.row-win {
   color: red;
+}
+
+.board-draw {
+  color: gray;
+}
+
+#player-names {
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  background-color: slategrey;
 }

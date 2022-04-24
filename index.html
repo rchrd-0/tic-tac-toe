@@ -9,7 +9,25 @@
   <title>The Odin Project—Tic Tac Toe</title>
 </head>
 <body>
-  <div class="main">
+  <div class="game">
+    <form id="player-names">
+    <label for="p1-name">Player 1</label>
+    <input 
+      type="text" 
+      name="p1-name" 
+      id="p1-name" 
+      placeholder="Enter name" 
+      maxlength="12"
+    >
+    <label for="p2-name">Player 2</label>
+    <input type="text"
+    name="p2-name"
+    id="p2-name"
+    placeholder="Enter name"
+    maxlength="12"
+    >
+    <button type="button" id="start-game-btn">Start game</button>
+  </form>
     <div class="user-interface" id="ui-top">
       <div class="players" id="player1">
         <span id="player1-name">Player 1</span>

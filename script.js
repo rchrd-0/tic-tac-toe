@@ -1,11 +1,55 @@
-const Player = (name, mark) => {
-  const getName = () => name;
+const Player = (playerNum, mark) => {
+  const getPlayerNum = () => playerNum;
   const getMark = () => mark;
   return {
-    getName,
+    getPlayerNum,
     getMark
   }
 }
+
+const form = document.querySelector('#player-names');
+const button = document.querySelector('#start-game-btn');
+button.addEventListener('click', startGame);
+
+function startGame() {
+  let inputNames = [form.elements['p1-name'].value, form.elements['p2-name'].value];
+  players.setNames(inputNames);
+  displayController.initInterface();
+  form.classList.add('hidden');
+}
+
+const players = (() => {
+    const CurrentPlayer = (playerNum, mark, turn) => {
+      const prototype = Player(playerNum, mark);
+      const getInitialTurn = () => turn;
+      const getUsername = () => usernames[playerNum - 1];
+      return Object.assign({}, prototype, {getInitialTurn}, {getUsername}, {turn});
+    }
+    const usernamesDefault = {
+      0: 'Player 1',
+      1: 'Player 2'
+    }
+    let usernames = Object.assign({}, usernamesDefault);
+    const p1 = CurrentPlayer(1, 'X', true);
+    const p2 = CurrentPlayer(2, 'O', false);
+    const getP1 = () => {return {...p1}};
+    const getP2 = () => {return {...p2}};
+
+    const setNames = (names) => {
+      for (let i = 0; i < names.length; i++) {
+        if (names[i] === '') {
+          names[i] = usernamesDefault[i];
+        }
+      }
+      usernames = Object.assign({}, {...names});
+    }
+    
+    return {
+      setNames,
+      getP1,
+      getP2
+    }
+  })();
 
 const gameBoard = (() => {
   const board = new Array(9).fill(null);
@@ -29,19 +73,13 @@ const gameBoard = (() => {
 })();
 
 const gameController = (() => {
-  const CurrentPlayer = (name, mark, turn) => {
-    const prototype = Player(name, mark);
-    const getInitialTurn = () => turn;
-    return Object.assign({}, prototype, {getInitialTurn}, {turn});
-  }
-  const p1 = CurrentPlayer('Player 1', 'X', true);
-  const p2 = CurrentPlayer('Player 2', 'O', false);
-
+  const p1 = players.getP1();
+  const p2 = players.getP2();
   const getActivePlayer = () => (p1.turn) ? {...p1} : {...p2};
   const toggleTurn = (...players) => {
     players.forEach(p => p.turn = !p.turn)
     let name = getActivePlayer()
-        .getName();
+        .getUsername();
     displayController.updateMessage(`${name}\'s turn`);
   }
   const resetTurns = (...players) => players.forEach(p => p.turn = p.getInitialTurn());
@@ -125,11 +163,11 @@ const displayController = (() => {
 
   const initInterface = () => {
     let startingPlayer = gameController.getActivePlayer()
-      .getName();
+      .getUsername();
     gameMessage.textContent = `${startingPlayer}\'s turn`;
     restartButton.textContent = 'Restart';
     gameTiles.forEach(tile => tile.addEventListener('click', getTile));
-    gameTiles.forEach(tile => tile.classList.remove('winning-row'));
+    gameTiles.forEach(tile => tile.className = 'game-tile');
   }
   
   const renderBoard = () => {
@@ -150,11 +188,12 @@ const displayController = (() => {
     gameTiles.forEach(tile => tile.removeEventListener('click', getTile));
     restartButton.textContent = 'Play again';
     if (Object.keys(player).length > 0) {
-      updateMessage(`${player.getName()} wins!`);
+      updateMessage(`${player.getUsername()} wins!`);
       [...gameTiles].filter(tile => player.row.includes(tile.dataset.tileNum))
-        .forEach(tile => tile.classList.add('winning-row'));
+        .forEach(tile => tile.classList.add('row-win'));
     } else {
       updateMessage('It\'s a draw ...');
+      gameTiles.forEach(tile => tile.classList.add('board-draw'))
     }
   }
   const restartGame = () => {
@@ -171,5 +210,3 @@ const displayController = (() => {
     endGame
   }
 })();
-
-window.addEventListener('load', displayController.initInterface)
