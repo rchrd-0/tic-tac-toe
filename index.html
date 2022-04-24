@@ -11,31 +11,31 @@
 <body>
   <div class="game">
     <form id="player-names">
-    <label for="p1-name">Player 1</label>
-    <input 
-      type="text" 
-      name="p1-name" 
-      id="p1-name" 
-      placeholder="Enter name" 
+      <label for="p1-name">Player 1</label>
+      <input 
+        type="text" 
+        name="p1-name" 
+        id="p1-name" 
+        placeholder="Enter name" 
+        maxlength="12"
+      >
+      <label for="p2-name">Player 2</label>
+      <input type="text"
+      name="p2-name"
+      id="p2-name"
+      placeholder="Enter name"
       maxlength="12"
-    >
-    <label for="p2-name">Player 2</label>
-    <input type="text"
-    name="p2-name"
-    id="p2-name"
-    placeholder="Enter name"
-    maxlength="12"
-    >
-    <button type="button" id="start-game-btn">Start game</button>
-  </form>
+      >
+      <button type="submit" id="start-game-btn">Start game</button>
+    </form>
     <div class="user-interface" id="ui-top">
-      <div class="players" id="player1">
-        <span id="player1-name">Player 1</span>
-        <span id="player1-mark">X</span>
+      <div class="player-card" id="player1">
+        <span class="card-username" id="player1-username"></span>
+        <span class="card-mark">X</span>
       </div>
-      <div class="players" id="player2">
-        <span id="player2-name">Player 2</span>
-        <span id="player2-mark">O</span>
+      <div class="player-card" id="player2">
+        <span class="card-username" id="player2-username"></span>
+        <span class="card-mark">O</span>
       </div>
       <div id="game-message"></div>
     </div>

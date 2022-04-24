@@ -7,17 +7,6 @@ const Player = (playerNum, mark) => {
   }
 }
 
-const form = document.querySelector('#player-names');
-const button = document.querySelector('#start-game-btn');
-button.addEventListener('click', startGame);
-
-function startGame() {
-  let inputNames = [form.elements['p1-name'].value, form.elements['p2-name'].value];
-  players.setNames(inputNames);
-  displayController.initInterface();
-  form.classList.add('hidden');
-}
-
 const players = (() => {
     const CurrentPlayer = (playerNum, mark, turn) => {
       const prototype = Player(playerNum, mark);
@@ -34,7 +23,6 @@ const players = (() => {
     const p2 = CurrentPlayer(2, 'O', false);
     const getP1 = () => {return {...p1}};
     const getP2 = () => {return {...p2}};
-
     const setNames = (names) => {
       for (let i = 0; i < names.length; i++) {
         if (names[i] === '') {
@@ -160,8 +148,24 @@ const displayController = (() => {
   const gameTiles = document.querySelectorAll('.game-tile');
   const restartButton = document.querySelector('#restart');
   const gameMessage = document.querySelector('#game-message');
+  const inputNames = document.querySelector('#player-names');
 
-  const initInterface = () => {
+  const readNames = (e) => {
+    const namesArr = [inputNames.elements['p1-name'].value, inputNames.elements['p2-name'].value];
+    e.preventDefault();
+
+    players.setNames(namesArr);
+    displayController.renderInterface();
+    inputNames.classList.add('hidden');
+  }
+
+  const renderInterface = () => {
+    const displayUsernames = document.querySelectorAll('.card-username');
+    
+    displayUsernames[0].textContent = players.getP1()
+      .getUsername();
+    displayUsernames[1].textContent = players.getP2()
+      .getUsername();
     let startingPlayer = gameController.getActivePlayer()
       .getUsername();
     gameMessage.textContent = `${startingPlayer}\'s turn`;
@@ -198,13 +202,15 @@ const displayController = (() => {
   }
   const restartGame = () => {
     gameController.resetGame();
-    initInterface();
+    renderInterface();
   }
 
+  // Event listeners
   restartButton.addEventListener('click', restartGame);
+  inputNames.addEventListener('submit', readNames);
 
   return {
-    initInterface,
+    renderInterface,
     renderBoard,
     updateMessage,
     endGame
