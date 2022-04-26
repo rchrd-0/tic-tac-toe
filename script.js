@@ -11,12 +11,12 @@ const players = (() => {
       getInitialTurn,
       getUsername,
       turn
-    };
-  };
+    }
+  }
   const usernamesDefault = {
     0: 'Player 1',
     1: 'Player 2'
-  };
+  }
   let usernames = Object.assign({}, usernamesDefault);
   const p1 = Player(1, 'X', true);
   const p2 = Player(2, 'O', false);
@@ -148,17 +148,58 @@ const gameController = (() => {
 const displayController = (() => {
   const gameTiles = document.querySelectorAll('.game-tile');
   const restartButton = document.querySelector('#restart');
+  const newGameButton = document.querySelector('#new-game');
   const gameMessage = document.querySelector('#game-message');
-  const inputNames = document.querySelector('#player-names');
 
-  const readNames = (e) => {
-    const namesArr = [inputNames.elements['p1-name'].value, inputNames.elements['p2-name'].value];
-    e.preventDefault();
+  const startMenuController = (() => {
+    const startMenu = document.querySelector('#start-menu');
+    const gameModesMenu = document.querySelector('#game-modes-container');
+    const playerNamesMenu = document.querySelector('#player-names-container');
+    const playerNamesForm = document.querySelector('#player-names');
+    const gameModeButton = [...document.querySelector('.game-modes').children];
+    const backButton = document.querySelector('#back-btn');
 
-    players.setNames(namesArr);
-    displayController.renderInterface();
-    inputNames.classList.add('hidden');
-  }
+    const hideMenu = (...menus) => {
+      menus.forEach(menu => menu.classList.toggle('hidden'));
+    }
+    const changeMenu = (e) => {
+      const menu = e.target.dataset.menu;
+      hideMenu(gameModesMenu);
+      switch (menu) {
+        case 'select-1p':
+          console.log('1 player');
+          break;
+        case 'select-2p':
+        case 'back':
+          hideMenu(playerNamesMenu);
+          break;
+      }
+    }
+    const resetMenu = () => hideMenu(startMenu, playerNamesMenu, gameModesMenu);
+    const readNames = (e) => {
+      e.preventDefault();
+      const inputValues = playerNamesForm.querySelectorAll('input[type="text"');
+      const namesArr = [];
+      inputValues.forEach(input => {
+        namesArr.push(input.value);
+        input.value = '';
+      })
+
+      players.setNames(namesArr);
+      displayController.renderInterface();
+      hideMenu(startMenu);
+    }
+
+    // Event listeners
+    gameModeButton.forEach(button => button.addEventListener('click', changeMenu));
+    playerNamesForm.addEventListener('submit', readNames);
+    backButton.addEventListener('click', changeMenu)
+
+    return {
+      resetMenu
+    }
+  })();
+
   const renderInterface = () => {
     const displayUsernames = document.querySelectorAll('.card-username');
     const startingPlayer = gameController.getActivePlayer().getUsername();
@@ -203,7 +244,7 @@ const displayController = (() => {
 
   // Event listeners
   restartButton.addEventListener('click', restartGame);
-  inputNames.addEventListener('submit', readNames);
+  newGameButton.addEventListener('click', startMenuController.resetMenu)
 
   return {
     renderInterface,
