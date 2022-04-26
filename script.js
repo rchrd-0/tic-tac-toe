@@ -244,7 +244,10 @@ const displayController = (() => {
 
   // Event listeners
   restartButton.addEventListener('click', restartGame);
-  newGameButton.addEventListener('click', startMenuController.resetMenu)
+  newGameButton.addEventListener('click', () => {
+    restartGame();
+    startMenuController.resetMenu()
+  })
 
   return {
     renderInterface,
