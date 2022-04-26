@@ -156,6 +156,7 @@ const displayController = (() => {
     const gameModesMenu = document.querySelector('#game-modes-container');
     const playerNamesMenu = document.querySelector('#player-names-container');
     const playerNamesForm = document.querySelector('#player-names');
+    const inputValues = playerNamesForm.querySelectorAll('input[type="text"');
     const gameModeButton = [...document.querySelector('.game-modes').children];
     const backButton = document.querySelector('#back-btn');
 
@@ -170,22 +171,22 @@ const displayController = (() => {
           console.log('1 player');
           break;
         case 'select-2p':
+          hideMenu(playerNamesMenu);
+          break;
         case 'back':
           hideMenu(playerNamesMenu);
+          playerNamesForm.reset();
           break;
       }
     }
     const resetMenu = () => hideMenu(startMenu, playerNamesMenu, gameModesMenu);
     const readNames = (e) => {
       e.preventDefault();
-      const inputValues = playerNamesForm.querySelectorAll('input[type="text"');
       const namesArr = [];
-      inputValues.forEach(input => {
-        namesArr.push(input.value);
-        input.value = '';
-      })
+      inputValues.forEach(input => namesArr.push(input.value))
 
       players.setNames(namesArr);
+      playerNamesForm.reset();
       displayController.renderInterface();
       hideMenu(startMenu);
     }
@@ -246,7 +247,7 @@ const displayController = (() => {
   restartButton.addEventListener('click', restartGame);
   newGameButton.addEventListener('click', () => {
     restartGame();
-    startMenuController.resetMenu()
+    startMenuController.resetMenu();
   })
 
   return {
