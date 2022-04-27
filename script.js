@@ -4,7 +4,7 @@ const players = (() => {
     const getMark = () => mark;
     const getInitialTurn = () => turn;
     const getUsername = () => usernames[playerNum - 1];
-  
+
     return {
       getPlayerNum,
       getMark,
@@ -15,7 +15,8 @@ const players = (() => {
   }
   const usernamesDefault = {
     0: 'Player 1',
-    1: 'Player 2'
+    1: 'Player 2',
+    2: 'Computer'
   }
   let usernames = Object.assign({}, usernamesDefault);
   const p1 = Player(1, 'X', true);
@@ -30,6 +31,8 @@ const players = (() => {
     for (let i = 0; i < names.length; i++) {
       if (names[i] === '') {
         names[i] = usernamesDefault[i];
+      } else if (names[1] === 'com') {
+        names[1] = usernamesDefault[2];
       }
     }
     usernames = Object.assign({}, {...names});
@@ -64,14 +67,21 @@ const gameBoard = (() => {
 })();
 
 const gameController = (() => {
+  let onePlayerMode = null;
+  const getPlayerMode = () => onePlayerMode;
+  const setOnePlayer = (bool) => onePlayerMode = bool;
   const p1 = players.getP1();
   const p2 = players.getP2();
   const getActivePlayer = () => (p1.turn) ? {...p1} : {...p2};
   const toggleTurn = (...players) => {
     players.forEach(p => p.turn = !p.turn)
     let name = getActivePlayer().getUsername();
-    displayController.updateMessage(`${name}\'s turn`);
+    // Message handling 1P v 2P
+    if (!getPlayerMode()) {
+      displayController.updateMessage(`${name}\'s turn`);
+    }
   }
+  
   const resetTurns = (...players) => players.forEach(p => p.turn = p.getInitialTurn());
   const playMove = (tile) => {
     let mark = getActivePlayer().getMark();
@@ -139,9 +149,12 @@ const gameController = (() => {
   }
 
   return {
+    onePlayerMode,
+    getPlayerMode,
+    setOnePlayer,
     getActivePlayer,
     playMove,
-    resetGame,
+    resetGame
   }
 })();
 
@@ -159,31 +172,37 @@ const displayController = (() => {
     const inputValues = playerNamesForm.querySelectorAll('input[type="text"');
     const gameModeButton = [...document.querySelector('.game-modes').children];
     const backButton = document.querySelector('#back-btn');
+    const p2Input = playerNamesForm.querySelector('input#p2-name');
 
     const hideMenu = (...menus) => {
       menus.forEach(menu => menu.classList.toggle('hidden'));
     }
     const changeMenu = (e) => {
       const menu = e.target.dataset.menu;
-      hideMenu(gameModesMenu);
+      const p2Row = playerNamesForm.querySelector('#p2-row');
+      hideMenu(gameModesMenu, playerNamesMenu);
       switch (menu) {
         case 'select-1p':
-          console.log('1 player');
+          p2Row.classList.add('input-disabled');
+          p2Input.disabled = true;
           break;
         case 'select-2p':
-          hideMenu(playerNamesMenu);
+          p2Row.classList.remove('input-disabled');
+          p2Input.disabled = false;
           break;
         case 'back':
-          hideMenu(playerNamesMenu);
           playerNamesForm.reset();
           break;
       }
     }
     const resetMenu = () => hideMenu(startMenu, playerNamesMenu, gameModesMenu);
-    const readNames = (e) => {
+    const startGame = (e) => {
       e.preventDefault();
+      const onePlayerMode = p2Input.disabled
       const namesArr = [];
+      p2Input.value = (onePlayerMode) ? 'com' : p2Input.value;
       inputValues.forEach(input => namesArr.push(input.value))
+      gameController.setOnePlayer(onePlayerMode);
 
       players.setNames(namesArr);
       playerNamesForm.reset();
@@ -193,7 +212,7 @@ const displayController = (() => {
 
     // Event listeners
     gameModeButton.forEach(button => button.addEventListener('click', changeMenu));
-    playerNamesForm.addEventListener('submit', readNames);
+    playerNamesForm.addEventListener('submit', startGame);
     backButton.addEventListener('click', changeMenu)
 
     return {
@@ -207,7 +226,10 @@ const displayController = (() => {
     
     displayUsernames[0].textContent = players.getP1().getUsername();
     displayUsernames[1].textContent = players.getP2().getUsername();
-    gameMessage.textContent = `${startingPlayer}\'s turn`;
+    // Message handling 1P v 2P
+    if (!gameController.getPlayerMode()) {
+      gameMessage.textContent = `${startingPlayer}\'s turn`;
+    }
     restartButton.textContent = 'Restart';
     gameTiles.forEach(tile => tile.addEventListener('click', getTile));
     gameTiles.forEach(tile => tile.className = 'game-tile');
