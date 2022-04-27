@@ -76,7 +76,7 @@ const gameController = (() => {
   const toggleTurn = (...players) => {
     players.forEach(p => p.turn = !p.turn)
     let name = getActivePlayer().getUsername();
-    // Message handling 1P v 2P
+    // Message handling 1P v 2P; bot handling
     if (!getPlayerMode()) {
       displayController.updateMessage(`${name}\'s turn`);
     }
@@ -141,6 +141,17 @@ const gameController = (() => {
       displayController.endGame(result);
     } else {
       toggleTurn(p1, p2)
+      // Bot handling
+      if (getPlayerMode() && getActivePlayer().getPlayerNum() === 2) {
+        let legalTiles = [];
+        for (let i = 0; i < board.length; i++) {
+          if (board[i] === null) {
+            legalTiles.push(i);
+          }
+        }
+        let randomTile = Math.floor(Math.random() * (legalTiles.length - 1));
+        gameController.playMove(legalTiles[randomTile]);
+      }
     }
   }
   const resetGame = () => {
@@ -226,7 +237,7 @@ const displayController = (() => {
     
     displayUsernames[0].textContent = players.getP1().getUsername();
     displayUsernames[1].textContent = players.getP2().getUsername();
-    // Message handling 1P v 2P
+    // Message handling 1P v 2P; bot handling
     if (!gameController.getPlayerMode()) {
       gameMessage.textContent = `${startingPlayer}\'s turn`;
     }
