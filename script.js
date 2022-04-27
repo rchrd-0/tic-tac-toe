@@ -69,7 +69,7 @@ const gameBoard = (() => {
 const gameController = (() => {
   let onePlayerMode = null;
   const getPlayerMode = () => onePlayerMode;
-  const setOnePlayer = (bool) => onePlayerMode = bool;
+  const setOnePlayerMode = (bool) => onePlayerMode = bool;
   const p1 = players.getP1();
   const p2 = players.getP2();
   const getActivePlayer = () => (p1.turn) ? {...p1} : {...p2};
@@ -77,7 +77,6 @@ const gameController = (() => {
     players.forEach(p => p.turn = !p.turn)
     displayController.displayTurn();
   }
-  
   const resetTurns = (...players) => players.forEach(p => p.turn = p.getInitialTurn());
   const playMove = (tile) => {
     let mark = getActivePlayer().getMark();
@@ -146,7 +145,9 @@ const gameController = (() => {
           }
         }
         let randomTile = Math.floor(Math.random() * (legalTiles.length - 1));
-        gameController.playMove(legalTiles[randomTile]);
+        setTimeout(() => {
+          gameController.playMove(legalTiles[randomTile]);
+        }, 400)
       }
     }
   }
@@ -157,7 +158,7 @@ const gameController = (() => {
 
   return {
     getPlayerMode,
-    setOnePlayer,
+    setOnePlayerMode,
     getActivePlayer,
     playMove,
     resetGame
@@ -208,7 +209,7 @@ const displayController = (() => {
       const namesArr = [];
       p2Input.value = (onePlayerMode) ? 'com' : p2Input.value;
       inputValues.forEach(input => namesArr.push(input.value))
-      gameController.setOnePlayer(onePlayerMode);
+      gameController.setOnePlayerMode(onePlayerMode);
 
       players.setNames(namesArr);
       playerNamesForm.reset();
