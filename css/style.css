@@ -174,3 +174,9 @@ label {
 .board-draw {
   color: gray;
 }
+
+.active-turn {
+  background-color: #88C0D0;
+  border: 1px solid #88C0D0;
+  color: #2E3440;
+}

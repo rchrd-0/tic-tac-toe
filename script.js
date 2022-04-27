@@ -75,11 +75,7 @@ const gameController = (() => {
   const getActivePlayer = () => (p1.turn) ? {...p1} : {...p2};
   const toggleTurn = (...players) => {
     players.forEach(p => p.turn = !p.turn)
-    let name = getActivePlayer().getUsername();
-    // Message handling 1P v 2P; bot handling
-    if (!getPlayerMode()) {
-      displayController.updateMessage(`${name}\'s turn`);
-    }
+    displayController.displayTurn();
   }
   
   const resetTurns = (...players) => players.forEach(p => p.turn = p.getInitialTurn());
@@ -121,7 +117,7 @@ const gameController = (() => {
           winConditions.forEach(condition => {
             if (condition.every(index => indices.includes(index))) {
               Object.assign(winningRow, {mark}, {row: [...condition].map(String)})
-              // String conversion to map data attributes
+              // String conversion to map data attributes in displayController.endGame()
             } 
           })
         })
@@ -160,7 +156,6 @@ const gameController = (() => {
   }
 
   return {
-    onePlayerMode,
     getPlayerMode,
     setOnePlayer,
     getActivePlayer,
@@ -217,7 +212,7 @@ const displayController = (() => {
 
       players.setNames(namesArr);
       playerNamesForm.reset();
-      displayController.renderInterface();
+      displayController.renderUI();
       hideMenu(startMenu);
     }
 
@@ -231,19 +226,17 @@ const displayController = (() => {
     }
   })();
 
-  const renderInterface = () => {
+  const renderUI = () => {
     const displayUsernames = document.querySelectorAll('.card-username');
-    const startingPlayer = gameController.getActivePlayer().getUsername();
-    
     displayUsernames[0].textContent = players.getP1().getUsername();
     displayUsernames[1].textContent = players.getP2().getUsername();
-    // Message handling 1P v 2P; bot handling
-    if (!gameController.getPlayerMode()) {
-      gameMessage.textContent = `${startingPlayer}\'s turn`;
-    }
+    gameMessage.textContent = '';
     restartButton.textContent = 'Restart';
-    gameTiles.forEach(tile => tile.addEventListener('click', getTile));
-    gameTiles.forEach(tile => tile.className = 'game-tile');
+    gameTiles.forEach(tile => {
+      tile.addEventListener('click', getTile);
+      tile.className = 'game-tile';
+    })
+    displayTurn();
   }
   const renderBoard = () => {
     const board = gameBoard.getBoard();
@@ -259,6 +252,17 @@ const displayController = (() => {
     } 
   }
   const updateMessage = (message) => gameMessage.textContent = message;
+  const displayTurn = () => {
+    const playerCards = document.querySelectorAll('.player-card');
+    const activePlayer = gameController.getActivePlayer().getPlayerNum();
+    for (let i = 0; i < playerCards.length; i++) {
+      if (playerCards[i].dataset.playerCardNum == activePlayer) {
+        playerCards[i].classList.add('active-turn');
+      } else {
+        playerCards[i].classList.remove('active-turn');
+      }
+    }
+  }
   const endGame = (player = {}) => {
     gameTiles.forEach(tile => tile.removeEventListener('click', getTile));
     restartButton.textContent = 'Play again';
@@ -273,7 +277,7 @@ const displayController = (() => {
   }
   const restartGame = () => {
     gameController.resetGame();
-    renderInterface();
+    renderUI();
   }
 
   // Event listeners
@@ -284,9 +288,10 @@ const displayController = (() => {
   })
 
   return {
-    renderInterface,
+    renderUI,
     renderBoard,
     updateMessage,
-    endGame
+    endGame,
+    displayTurn
   }
 })();
