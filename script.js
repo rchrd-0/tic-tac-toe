@@ -205,11 +205,10 @@ const displayController = (() => {
     const resetMenu = () => hideMenu(startMenu, playerNamesMenu, gameModesMenu);
     const startGame = (e) => {
       e.preventDefault();
-      const onePlayerMode = p2Input.disabled
       const namesArr = [];
-      p2Input.value = (onePlayerMode) ? 'com' : p2Input.value;
+      p2Input.value = (p2Input.disabled) ? 'com' : p2Input.value;
       inputValues.forEach(input => namesArr.push(input.value))
-      gameController.setOnePlayerMode(onePlayerMode);
+      gameController.setOnePlayerMode(p2Input.disabled);
 
       players.setNames(namesArr);
       playerNamesForm.reset();
@@ -246,8 +245,13 @@ const displayController = (() => {
     }
   }
   const getTile = (e) => {
+    const onePlayerMode = gameController.getPlayerMode();
+    const activePlayer = gameController.getActivePlayer().getPlayerNum();
     let targetTile = e.target;
     let tileNum = targetTile.dataset.tileNum;
+    if (onePlayerMode && activePlayer === 2) {
+      return;
+    }
     if (!targetTile.textContent) {
       gameController.playMove(tileNum);
     } 
