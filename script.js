@@ -13,12 +13,6 @@ const players = (() => {
       turn
     }
   }
-  const usernamesDefault = {
-    0: 'Player 1',
-    1: 'Player 2',
-    2: 'Computer'
-  }
-  let usernames = Object.assign({}, usernamesDefault);
   const p1 = Player(1, 'X', true);
   const p2 = Player(2, 'O', false);
   const getP1 = () => {
@@ -27,6 +21,12 @@ const players = (() => {
   const getP2 = () => {
     return {...p2}
   }
+  const usernamesDefault = {
+    0: 'Player 1',
+    1: 'Player 2',
+    2: 'Computer'
+  }
+  let usernames = Object.assign({}, usernamesDefault);
   const setNames = (names) => {
     for (let i = 0; i < names.length; i++) {
       if (names[i] === '') {
@@ -67,9 +67,6 @@ const gameBoard = (() => {
 })();
 
 const gameController = (() => {
-  let onePlayerMode = null;
-  const getPlayerMode = () => onePlayerMode;
-  const setOnePlayerMode = (bool) => onePlayerMode = bool;
   const p1 = players.getP1();
   const p2 = players.getP2();
   const getActivePlayer = () => (p1.turn) ? {...p1} : {...p2};
@@ -80,10 +77,33 @@ const gameController = (() => {
   const resetTurns = (...players) => players.forEach(p => p.turn = p.getInitialTurn());
   const playMove = (tile) => {
     let mark = getActivePlayer().getMark();
+    let name = getActivePlayer().getUsername();
     gameBoard.placeMark(tile, mark);
-    checkWin();
+    findWin(mark, name)
   }
-  const checkWin = () => {
+
+  let onePlayerMode = null;
+  const getPlayerMode = () => onePlayerMode;
+  const setOnePlayerMode = (bool) => onePlayerMode = bool;
+  const isBotTurn = () => {
+    return (getPlayerMode() && getActivePlayer().getPlayerNum() === 2)
+  }
+
+  const botPlayRandom = () => {
+    const board = gameBoard.getBoard();
+    let emptyTiles = [];
+    for (let i = 0; i < board.length; i++) {
+      if (board[i] === null) {
+        emptyTiles.push(i);
+      }
+    }
+    let random = Math.floor(Math.random() * (emptyTiles.length - 1));
+    setTimeout(() => {
+      playMove(emptyTiles[random])
+    }, 400);
+  }
+
+  const checkWin = (player) => {
     const board = gameBoard.getBoard();
     const winConditions = [
       [0, 1, 2],
@@ -95,73 +115,48 @@ const gameController = (() => {
       [0, 4, 8],
       [2, 4, 6]
     ]
-    const getWinner = (() => {
-      const players = {
-        p1: Object.assign({...p1}, {count: board.filter(mark => mark === p1.getMark()).length}),
-        p2: Object.assign({...p2}, {count: board.filter(mark => mark === p2.getMark()).length})
-      }
-      let checkWinFor = Object.keys(players)
-        .filter(p => players[p].count >= 3)
-        .map(p => players[p].getMark());
-
-      return (function() {
-        let winningRow = {}
-        checkWinFor.forEach(mark => {
-          let indices = [];
-          for (let i = 0; i < board.length; i++) {
-            if (board[i] === mark) {
-              indices.push(i);
-            }
-          }
-          winConditions.forEach(condition => {
-            if (condition.every(index => indices.includes(index))) {
-              Object.assign(winningRow, {mark}, {row: [...condition].map(String)})
-              // String conversion to map data attributes in displayController.endGame()
-            } 
-          })
-        })
-
-        if (Object.keys(winningRow).length > 0) {
-          let winner = Object.keys(players)
-            .filter(p => players[p].getMark() === winningRow.mark);
-          winner = Object.assign({...players[winner]}, {row: winningRow.row});
-          
-          return winner
-        }
-      })();
-    })();
-
-    if (getWinner || !board.includes(null)) {
-      let result = (getWinner) ? {...getWinner} : {};
-      displayController.endGame(result);
-    } else {
-      toggleTurn(p1, p2)
-      // Bot handling
-      if (getPlayerMode() && getActivePlayer().getPlayerNum() === 2) {
-        let legalTiles = [];
-        for (let i = 0; i < board.length; i++) {
-          if (board[i] === null) {
-            legalTiles.push(i);
-          }
-        }
-        let randomTile = Math.floor(Math.random() * (legalTiles.length - 1));
-        setTimeout(() => {
-          gameController.playMove(legalTiles[randomTile]);
-        }, 400)
+    for (let i = 0; i < winConditions.length; i++) {
+      if (winConditions[i].every(index => board[index] === player)) {
+        return winConditions[i]
       }
     }
   }
+  const findWin = (mark, name) => {
+    const board = gameBoard.getBoard();
+    const gameDraw = !board.includes(null)
+    const gameWin = !!checkWin(mark)
+
+    switch (true) {
+      case gameWin:
+        const player = {
+          [name]: checkWin(mark).map(String)
+        }
+        displayController.endGame(player);
+        break;
+      case gameDraw:
+        displayController.endGame();
+        break;
+      default:
+        toggleTurn(p1, p2);
+
+        if (isBotTurn()) {
+          botPlayRandom();
+        }
+    }
+  }
   const resetGame = () => {
+    clearTimeout(botPlayRandom);
     resetTurns(p1, p2);
     gameBoard.resetBoard();
   }
 
   return {
-    getPlayerMode,
     setOnePlayerMode,
+    isBotTurn,
     getActivePlayer,
     playMove,
-    resetGame
+    resetGame,
+    checkWin
   }
 })();
 
@@ -244,13 +239,12 @@ const displayController = (() => {
       gameTiles[i].textContent = board[i];
     }
   }
+
   const getTile = (e) => {
-    const onePlayerMode = gameController.getPlayerMode();
-    const activePlayer = gameController.getActivePlayer().getPlayerNum();
     let targetTile = e.target;
     let tileNum = targetTile.dataset.tileNum;
-    if (onePlayerMode && activePlayer === 2) {
-      return;
+    if (gameController.isBotTurn()) {
+      return
     }
     if (!targetTile.textContent) {
       gameController.playMove(tileNum);
@@ -271,16 +265,22 @@ const displayController = (() => {
   const endGame = (player = {}) => {
     gameTiles.forEach(tile => tile.removeEventListener('click', getTile));
     restartButton.textContent = 'Play again';
-    if (Object.keys(player).length > 0) {
-      updateMessage(`${player.getUsername()} wins!`);
-      [...gameTiles].filter(tile => player.row.includes(tile.dataset.tileNum))
+    const isWin = Object.keys(player).length > 0;
+
+    if (isWin) {
+      const name = Object.keys(player).pop();
+      updateMessage(`${name} wins!`);
+      [...gameTiles].filter(tile => player[name].includes(tile.dataset.tileNum))
         .forEach(tile => tile.classList.add('row-win'));
     } else {
-      updateMessage('It\'s a draw ...');
-      gameTiles.forEach(tile => tile.classList.add('board-draw'))
+      updateMessage('It\'s a draw ...')
+      gameTiles.forEach(tile => tile.classList.add('board-draw'));
     }
   }
   const restartGame = () => {
+    if (gameController.isBotTurn()) {
+      return
+    }
     gameController.resetGame();
     renderUI();
   }
@@ -288,6 +288,9 @@ const displayController = (() => {
   // Event listeners
   restartButton.addEventListener('click', restartGame);
   newGameButton.addEventListener('click', () => {
+    if (gameController.isBotTurn()) {
+      return
+    }
     restartGame();
     startMenuController.resetMenu();
   })
