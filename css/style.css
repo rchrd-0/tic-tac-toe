@@ -130,6 +130,7 @@ label {
   display: flex;
   border: 1px solid black;
   justify-content: space-between;
+  transition: all 0.2s ease;
 }
 
 #ui-bottom {
@@ -172,6 +173,7 @@ label {
 }
 
 .active-turn {
+  transition: all 0.2s ease;
   background-color: #88C0D0;
   border: 1px solid #88C0D0;
   color: #2E3440;

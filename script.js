@@ -24,7 +24,7 @@ const players = (() => {
   const usernamesDefault = {
     0: 'Player 1',
     1: 'Player 2',
-    2: 'Computer'
+    2: ['Computer', 'R2-D2', 'C-3PO', 'HAL 9000', 'Ava', 'Bot-Beep-Boop', 'TARS', 'Wall-E']
   }
   let usernames = Object.assign({}, usernamesDefault);
   const setNames = (names) => {
@@ -32,7 +32,8 @@ const players = (() => {
       if (names[i] === '') {
         names[i] = usernamesDefault[i];
       } else if (names[1] === 'com') {
-        names[1] = usernamesDefault[2];
+        let random = Math.floor(Math.random() * (usernamesDefault[2].length));
+        names[1] = usernamesDefault[2][random];
       }
     }
     usernames = Object.assign({}, {...names});
