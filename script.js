@@ -85,9 +85,8 @@ const gameController = (() => {
   let onePlayerMode = null;
   const getPlayerMode = () => onePlayerMode;
   const setOnePlayerMode = bool => onePlayerMode = bool;
-  const isBotTurn = () => {
-    return (getPlayerMode() && getActivePlayer().getPlayerNum() === 2)
-  }
+  const isBotTurn = () => (getPlayerMode() && getActivePlayer().getPlayerNum() === 2)
+  
 
   const checkWin = board => {
     const winConditions = [
@@ -139,7 +138,7 @@ const gameController = (() => {
       const winExists = !!checkWin(board);
       if (winExists) {
         let winningRow = checkWin(board);
-        let winner = b[winningRow[0]];
+        let winner = board[winningRow[0]];
 
         return (winner === bot) ? +10 : -10;
       } else {
@@ -149,11 +148,27 @@ const gameController = (() => {
     const minimax = (board, depth, isMaximizing) => {
       
     }
-    const findBestMove = (board, mark) => {
-
+    const findBestMove = (board) => {
+      let bestScore = -Infinity;
+      let bestMove;
+      for (let i = 0; i < board.length; i++) {
+        if (board[i] === null) {
+          board[i] = bot;
+          let score = minimax(board, 0, false);
+          board[i] = null;
+          if (score > bestScore) {
+            bestScore = score;
+            bestMove = i;
+          }
+        }
+      }
+      return bestMove;
     }
-    const playBestMove = (board, mark) => {
-
+    const playBestMove = (board) => {
+      let bestMove = findBestMove(board);
+      setTimeout(() => {
+        playMove(bestMove);
+      }, 400)
     }
     return {
       playBestMove
