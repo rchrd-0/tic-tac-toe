@@ -79,7 +79,7 @@ form#player-names {
 label {
   display: flex;
   justify-content: flex-end;
-  width: 75px;
+  width: 100px;
 }
 
 .input-row input[type="text"] {
@@ -90,10 +90,6 @@ label {
   padding: 5px 10px;
   border-radius: 4px;
   border: 1px solid black;
-}
-
-.input-disabled {
-  opacity: 0.2;
 }
 
 .game {

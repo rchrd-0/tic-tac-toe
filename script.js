@@ -69,7 +69,10 @@ const gameBoard = (() => {
 const gameController = (() => {
   const p1 = players.getP1();
   const p2 = players.getP2();
-  const getActivePlayer = () => (p1.turn) ? {...p1} : {...p2};
+  let onePlayerMode = null;
+  let gameState = false;
+
+  // Methods controlling game flow
   const toggleTurn = (...players) => {
     players.forEach(p => p.turn = !p.turn)
     displayController.displayTurn();
@@ -81,13 +84,6 @@ const gameController = (() => {
     gameBoard.placeMark(tile, mark);
     findWin(name)
   }
-
-  let onePlayerMode = null;
-  const getPlayerMode = () => onePlayerMode;
-  const setOnePlayerMode = bool => onePlayerMode = bool;
-  const isBotTurn = () => (getPlayerMode() && getActivePlayer().getPlayerNum() === 2)
-  
-
   const checkWin = board => {
     const winConditions = [
       [0, 1, 2],
@@ -111,25 +107,39 @@ const gameController = (() => {
     const thisBoard = gameBoard.getBoard();
     const gameDraw = !thisBoard.includes(null);
     const gameWin = !!checkWin(thisBoard);
-    
-    switch (true) {
-      case gameWin:
+
+    if (gameWin || gameDraw) {
+      setGameOver(true);
+      if (gameWin) {
         const player = {
           [name]: checkWin(thisBoard).map(String)
         }
         displayController.endGame(player);
-        break;
-      case gameDraw:
+      } else if (gameDraw) {
         displayController.endGame();
-        break;
-      default:
-        toggleTurn(p1, p2);
-        
-        if (isBotTurn()) {
-          botLogic.playBestMove(thisBoard);
-        }
+      }
+    } else {
+      toggleTurn(p1, p2)
+
+      if (botTurn()) {
+        botLogic.playBestMove(thisBoard);
+      }
     }
   }
+  const resetGame = () => {
+    resetTurns(p1, p2);
+    setGameOver(false);
+    gameBoard.resetBoard();
+  }
+
+  // Methods re: information about game state
+  const setGameOver = bool => gameState = bool;
+  const setOnePlayerMode = bool => onePlayerMode = bool;
+  const botTurn = () => (onePlayerMode && getActivePlayer().getPlayerNum() === 2)
+  const getGameState = () => gameState;
+  const getActivePlayer = () => (p1.turn) ? {...p1} : {...p2};
+
+  // Module containing bot/AI logic
   const botLogic = (() => {
     let player = 'X';
     let bot = 'O';
@@ -208,18 +218,13 @@ const gameController = (() => {
     }
   })();
 
-  const resetGame = () => {
-    resetTurns(p1, p2);
-    gameBoard.resetBoard();
-  }
-
   return {
     setOnePlayerMode,
-    isBotTurn,
+    botTurn,
+    getGameState,
     getActivePlayer,
     playMove,
-    resetGame,
-    checkWin
+    resetGame
   }
 })();
 
@@ -244,15 +249,19 @@ const displayController = (() => {
     }
     const changeMenu = e => {
       const menu = e.target.dataset.menu;
+      const p1Label = playerNamesForm.querySelector('label[for="p1-name"]');
       const p2Row = playerNamesForm.querySelector('#p2-row');
+      const p2Elements = [...p2Row.children];
       hideMenu(gameModesMenu, playerNamesMenu);
       switch (menu) {
         case 'select-1p':
-          p2Row.classList.add('input-disabled');
+          p1Label.textContent = 'Your name';
+          p2Elements.forEach(element => element.classList.add('hidden'))
           p2Input.disabled = true;
           break;
         case 'select-2p':
-          p2Row.classList.remove('input-disabled');
+          p1Label.textContent = 'Player 1';
+          p2Elements.forEach(element => element.classList.remove('hidden'))
           p2Input.disabled = false;
           break;
         case 'back':
@@ -306,7 +315,8 @@ const displayController = (() => {
   const getTile = e => {
     let targetTile = e.target;
     let tileNum = targetTile.dataset.tileNum;
-    if (gameController.isBotTurn()) {
+    if (gameController.botTurn()) {
+      // If playing against bot, wait for turn completion
       return
     }
     if (!targetTile.textContent) {
@@ -340,10 +350,12 @@ const displayController = (() => {
       gameTiles.forEach(tile => tile.classList.add('board-draw'));
     }
   }
+  
   const restartGame = () => {
-    // if (gameController.isBotTurn()) {
-    //   return
-    // }
+    // If playing against bot, wait for turn completion
+    if (gameController.botTurn() && !gameController.getGameState()) {
+      return;
+    }
     gameController.resetGame();
     renderUI();
   }
@@ -351,9 +363,10 @@ const displayController = (() => {
   // Event listeners
   restartButton.addEventListener('click', restartGame);
   newGameButton.addEventListener('click', () => {
-    // if (gameController.isBotTurn()) {
-    //   return
-    // }
+    // If playing against bot, wait for turn completion
+    if (gameController.botTurn() && !gameController.getGameState()) {
+      return;
+    }
     restartGame();
     startMenuController.resetMenu();
   })
