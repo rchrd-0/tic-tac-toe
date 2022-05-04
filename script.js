@@ -230,6 +230,7 @@ const gameController = (() => {
 })();
 
 const displayController = (() => {
+  const gameContainer = document.querySelector('.game');
   const gameTiles = document.querySelectorAll('.game-tile');
   const restartButton = document.querySelector('#restart');
   const newGameButton = document.querySelector('#new-game');
@@ -245,24 +246,27 @@ const displayController = (() => {
     const backButton = document.querySelector('#back-btn');
     const p2Input = playerNamesForm.querySelector('input#p2-name');
 
-    const hideMenu = (...menus) => {
-      menus.forEach(menu => menu.classList.toggle('hidden'));
+    const toggleHidden = (...elements) => {
+      elements.forEach(element => element.classList.toggle('display-none'));
+    }
+    const toggleOpacity = (...elements) => {
+      elements.forEach(element => element.classList.toggle('opacity-none'));
     }
     const changeMenu = e => {
       const menu = e.target.dataset.menu;
       const p1Label = playerNamesForm.querySelector('label[for="p1-name"]');
       const p2Row = playerNamesForm.querySelector('#p2-row');
       const p2Elements = [...p2Row.children];
-      hideMenu(gameModesMenu, playerNamesMenu);
+      toggleHidden(gameModesMenu, playerNamesMenu);
       switch (menu) {
         case 'select-1p':
           p1Label.textContent = 'Your name';
-          p2Elements.forEach(element => element.classList.add('hidden'))
+          p2Elements.forEach(element => element.classList.add('display-none'))
           p2Input.disabled = true;
           break;
         case 'select-2p':
           p1Label.textContent = 'Player 1';
-          p2Elements.forEach(element => element.classList.remove('hidden'))
+          p2Elements.forEach(element => element.classList.remove('display-none'))
           p2Input.disabled = false;
           break;
         case 'back':
@@ -270,7 +274,12 @@ const displayController = (() => {
           break;
       }
     }
-    const resetMenu = () => hideMenu(startMenu, playerNamesMenu, gameModesMenu);
+    const resetMenu = () => {
+      if (!gameContainer.classList.contains('opacity-none')) {
+        toggleOpacity(gameContainer);
+      }
+      toggleHidden(startMenu, playerNamesMenu, gameModesMenu);
+    }
     const startGame = e => {
       e.preventDefault();
       const namesArr = [];
@@ -281,7 +290,8 @@ const displayController = (() => {
       players.setNames(namesArr);
       playerNamesForm.reset();
       displayController.renderUI();
-      hideMenu(startMenu);
+      toggleHidden(startMenu);
+      toggleOpacity(gameContainer);
     }
 
     // Event listeners
