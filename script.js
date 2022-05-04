@@ -24,7 +24,18 @@ const players = (() => {
   const usernamesDefault = {
     0: 'Player 1',
     1: 'Player 2',
-    2: ['Computer', 'R2-D2', 'C-3PO', 'HAL 9000', 'Ava', 'Bot-Beep-Boop', 'TARS', 'Wall-E']
+    2: [
+        'Computer', 
+        'R2-D2', 
+        'C-3PO', 
+        'HAL 9000', 
+        'Ava', 
+        'Roy Batty', 
+        'T-800', 
+        'TARS', 
+        'Wall-E',
+        'Bot'
+      ]
   }
   let usernames = Object.assign({}, usernamesDefault);
   const setNames = (names) => {
@@ -242,7 +253,8 @@ const displayController = (() => {
     const playerNamesMenu = document.querySelector('#player-names-container');
     const playerNamesForm = document.querySelector('#player-names');
     const inputValues = playerNamesForm.querySelectorAll('input[type="text"');
-    const gameModeButton = [...document.querySelector('.game-modes').children];
+    const gameModeButtons = document.querySelectorAll('.game-mode-btn');
+    const gameModeTitle = document.querySelector('#game-mode-title');
     const backButton = document.querySelector('#back-btn');
     const p2Input = playerNamesForm.querySelector('input#p2-name');
 
@@ -260,11 +272,13 @@ const displayController = (() => {
       toggleHidden(gameModesMenu, playerNamesMenu);
       switch (menu) {
         case 'select-1p':
-          p1Label.textContent = 'Your name';
+          gameModeTitle.textContent = '1 Player'
+          p1Label.textContent = 'Name';
           p2Elements.forEach(element => element.classList.add('display-none'))
           p2Input.disabled = true;
           break;
         case 'select-2p':
+          gameModeTitle.textContent = '2 Players'
           p1Label.textContent = 'Player 1';
           p2Elements.forEach(element => element.classList.remove('display-none'))
           p2Input.disabled = false;
@@ -295,7 +309,7 @@ const displayController = (() => {
     }
 
     // Event listeners
-    gameModeButton.forEach(button => button.addEventListener('click', changeMenu));
+    gameModeButtons.forEach(button => button.addEventListener('click', changeMenu));
     playerNamesForm.addEventListener('submit', startGame);
     backButton.addEventListener('click', changeMenu)
 

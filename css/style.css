@@ -1,6 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600;700&display=swap');
 
 :root {
+  --base: #EDDCD2;
   --primary-1: #FFF1E6;
   --primary-2: #726168;
   --primary-1-alt: #FFE8D6;
@@ -14,7 +15,8 @@
 html,
 body,
 div,
-span {
+span, 
+h1 {
   margin: 0;
   padding: 0;
   border: 0;
@@ -33,7 +35,10 @@ html {
 
 body {
   font-family: 'Jost', Helvetica, Arial, sans-serif;
+  background: url('../img/background.svg') no-repeat fixed;
+  background-size: cover;
 }
+
 
 .display-none {
   display: none;
@@ -45,33 +50,93 @@ body {
 }
 
 .main {
+  display: grid;
   width: 500px;
   grid-template-columns: 30px 1fr 30px;
   grid-template-rows: 25px 1fr 25px;
   margin: 50px auto;
-  display: grid;
-  border-radius: 8px;
-  background-color: #eddcd2;
-  color: var(--neutral-1);
+  color: var(--primary-2);
 }
 
 #start-menu {
-  grid-area: 1 / 1 / span all / span all;
   z-index: 1;
-  padding: 50px;
+  grid-column: 2;
+  grid-row: 2;
+  width: 320px;
+  height: 320px;
+  padding-top: 20px;
+  border-radius: 8px;
+  justify-self: center;
+  vertical-align: middle;
+  background-color: var(--base);
+  color: var(--primary-2);
+  box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
+}
+
+#title {
+  text-align: center;
+  font-size: 2.2rem;
+  font-weight: 700;
+}
+
+.menu-message {
+  width: 100%;
+  margin-top: 10px;
+  text-align: center;
+  font-size: 1.3rem;
+  font-weight: 500;
+}
+
+.menu-message > span {
+  padding: 5px 10px;
+  border-radius: 4px;
+  background-color: var(--primary-2);
+  color: var(--primary-1-alt);
 }
 
 .game-modes {
   display: flex;
   justify-content: center;
+  flex-wrap: wrap;
+  gap: 30px;
+}
+
+#menu-footer {
+  padding: 5px 10px;
+  border-radius: 12px;
+  background-color: var(--primary-2);
+  color: var(--primary-1);
+  margin-top: 50px;
+  text-align: center;
+}
+
+#menu-footer a {
+  color: var(--accent-3);
+}
+
+a:link,
+a:visited {
+  color: var(--primary-1);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+#menu-2-wrapper {
+  padding-bottom: 25px;
+  display: flex;
+  flex-direction: column;
+  height: 250px;
   gap: 20px;
 }
 
+
+
 form#player-names {
-  padding: 20px;
+  padding: 0 20px;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
+  gap: 12px;
 }
 
 .input-row {
@@ -81,13 +146,21 @@ form#player-names {
   align-items: center;
   gap: 20px;
   width: 100%;
-  margin-bottom: 12px;
+}
+
+.button-row {
+  margin-top: 20px;
+  align-self: flex-end;
+  display: flex;
+  gap: 20px;
 }
 
 label {
+  font-size: 1.3rem;
+  font-weight: 400;
   display: flex;
-  justify-content: flex-end;
-  width: 100px;
+  justify-content: center;
+  width: 75px;
 }
 
 .input-row input[type="text"] {
@@ -97,17 +170,29 @@ label {
   font-size: 1rem;
   padding: 5px 10px;
   border-radius: 4px;
-  border: 1px solid black;
+  border: 1px solid var(--primary-2-alt);
+}
+
+input:focus {
+  outline: 2px solid var(--primary-2-alt);
+  border-color: var(--primary-2-alt)
+}
+
+input::placeholder {
+  font-weight: 300;
 }
 
 .game {
   grid-area: 2 / 2 / span 1 / span 1;
   display: flex;
-  align-items: center;
   gap: 10px;
+  padding: 20px;
+  align-items: center;
   flex-direction: column;
-  /* transition: all 0.3s ease; */
-  /* border: 1px solid black; */
+  border-radius: 8px;
+  background-color: var(--base);
+  box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
+  transition: all 0.3s ease;
 }
 
 .user-interface {
@@ -116,14 +201,14 @@ label {
 }
 
 .btn {
-  font-size: 1.4rem;
-  font-family: inherit;
-  font-weight: 500;
   border-radius: 8px;
-  background-color: var(--primary-1);
-  border: 1px solid var(--primary-1);
-  color: var(--primary-2);
   padding: 4px 12px;
+  background-color: var(--primary-1);
+  color: var(--primary-2);
+  border: 1px solid var(--primary-1);
+  font-weight: 500;
+  font-family: inherit;
+  font-size: 1.4rem;
   box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px;
 }
 

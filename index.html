@@ -11,39 +11,56 @@
 <body>
   <div class="main">
     <div id="start-menu">
+      <h1 id="title">Tic Tac Toe</h1>
       <div id="game-modes-container">
         <div class="game-modes">
-          <button class="btn menu-btn" data-menu="select-1p">1 Player</button>
-          <button class="btn menu-btn" data-menu="select-2p">2 Players</button>
+          <div class="menu-message" id="game-mode-msg">
+            <span>Select game mode</span>
+          </div>
+          <button class="btn menu-btn game-mode-btn" data-menu="select-1p">1 Player</button>
+          <button class="btn menu-btn game-mode-btn" data-menu="select-2p">2 Players</button>
+          <div id="menu-footer">
+            Made by 
+            <a href="https://github.com/rchrd-0" target="_blank">RCHRD</a> for 
+            <a href="https://www.theodinproject.com/" target="_blank">
+              The Odin Project
+            </a>
+          </div>
         </div>
       </div>
       <div class="display-none" id="player-names-container">
-        <form id="player-names">
-          <div class="input-row" id="p1-row">
-            <label for="p1-name"></label>
-            <input
-              type="text"
-              name="p1-name"
-              id="p1-name"
-              placeholder="Enter name"
+        <div id="menu-2-wrapper">
+          <div class="menu-message" id="game-mode-msg">
+            <span id="game-mode-title"></span>
+          </div>
+          <form id="player-names">
+            <div class="input-row" id="p1-row">
+              <label for="p1-name"></label>
+              <input
+                type="text"
+                name="p1-name"
+                id="p1-name"
+                placeholder="Optional"
+                maxlength="12"
+              >
+            </div>
+            <div class="input-row" id="p2-row">
+              <label for="p2-name">Player 2</label>
+              <input type="text"
+              name="p2-name"
+              id="p2-name"
+              placeholder="Optional"
               maxlength="12"
-            >
-          </div>
-          <div class="input-row" id="p2-row">
-            <label for="p2-name">Player 2</label>
-            <input type="text"
-            name="p2-name"
-            id="p2-name"
-            placeholder="Enter name"
-            maxlength="12"
-            >
-          </div>
-          <div class="button-row">
-            <button class="btn menu-btn" type="submit" id="start-game-btn">Start game</button>
-            <button class="btn menu-btn" type="button" id="back-btn" data-menu="back">Back</button>
-          </div>
-        </form>
+              >
+            </div>
+            <div class="button-row">
+              <button class="btn menu-btn" type="submit" id="start-game-btn">Start game</button>
+              <button class="btn menu-btn" type="button" id="back-btn" data-menu="back">Back</button>
+            </div>
+          </form>
+        
       </div>
+    </div>
     </div>
     <div class="game opacity-none">
       <div class="user-interface" id="ui-top">
