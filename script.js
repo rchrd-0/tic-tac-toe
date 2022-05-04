@@ -289,7 +289,7 @@ const displayController = (() => {
 
       players.setNames(namesArr);
       playerNamesForm.reset();
-      displayController.renderUI();
+      displayController.resetUI();
       toggleHidden(startMenu);
       toggleOpacity(gameContainer);
     }
@@ -304,23 +304,31 @@ const displayController = (() => {
     }
   })();
 
-  const renderUI = () => {
+  const resetUI = () => {
     const displayUsernames = document.querySelectorAll('.card-username');
     displayUsernames[0].textContent = players.getP1().getUsername();
     displayUsernames[1].textContent = players.getP2().getUsername();
     gameMessage.textContent = '';
     restartButton.textContent = 'Restart';
-    gameTiles.forEach(tile => {
-      tile.addEventListener('click', getTile);
-      tile.className = 'game-tile';
-    })
+    resetBoard();
     displayTurn();
   }
   const renderBoard = () => {
     const thisBoard = gameBoard.getBoard();
     for (let i = 0; i < gameTiles.length; i++) {
       gameTiles[i].textContent = thisBoard[i];
+      if (gameTiles[i].textContent === 'X') {
+        gameTiles[i].classList.add('p1-mark');
+      } else if (gameTiles[i].textContent === 'O') {
+        gameTiles[i].classList.add('p2-mark');
+      }
     }
+  }
+  const resetBoard = () => {
+    gameTiles.forEach(tile => {
+      tile.addEventListener('click', getTile);
+      tile.className = 'game-tile'
+    })
   }
 
   const getTile = e => {
@@ -368,7 +376,7 @@ const displayController = (() => {
       return;
     }
     gameController.resetGame();
-    renderUI();
+    resetUI();
   }
 
   // Event listeners
@@ -383,7 +391,7 @@ const displayController = (() => {
   })
 
   return {
-    renderUI,
+    resetUI,
     renderBoard,
     updateMessage,
     endGame,
