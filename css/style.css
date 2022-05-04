@@ -35,10 +35,6 @@ body {
   font-family: 'Jost', Helvetica, Arial, sans-serif;
 }
 
-.hidden {
-  display: none;
-}
-
 .display-none {
   display: none;
 }
@@ -63,7 +59,6 @@ body {
   grid-area: 1 / 1 / span all / span all;
   z-index: 1;
   padding: 50px;
-  /* background-color: #fff; */
 }
 
 .game-modes {
@@ -77,7 +72,6 @@ form#player-names {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  /* background-color: honeydew; */
 }
 
 .input-row {
@@ -121,10 +115,37 @@ label {
   font-size: 1.3rem;
 }
 
+.btn {
+  font-size: 1.4rem;
+  font-family: inherit;
+  font-weight: 500;
+  border-radius: 8px;
+  background-color: var(--primary-1);
+  border: 1px solid var(--primary-1);
+  color: var(--primary-2);
+  padding: 4px 12px;
+  box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px;
+}
+
+.btn:focus {
+  outline: none;
+}
+
+.btn:active {
+  border-radius: 12px;
+  transition: all 0.2s ease;
+  filter: brightness(0.75);
+}
+
 #ui-top {
   width: 100%;
   flex-flow: row wrap;
   justify-content: space-between;
+}
+
+.game-tile.valid:active {
+  opacity: 0.8;
+  transition: opacity 0.1s ease;
 }
 
 #game-message {
@@ -185,8 +206,8 @@ label {
   line-height: 100px;
   text-align: center;
   vertical-align: middle;
-  box-shadow: var(--card-shadow);
   box-shadow: rgba(0, 0, 0, 0.18) 0px 2px 4px;
+  transition: all 0.5s ease;
 }
 
 .p1-mark {
@@ -195,9 +216,8 @@ label {
 }
 
 .p2-mark {
-  color: var(--primary-2-alt);
   color: #332B2F;
-  transition: all 0.3s ease;
+  transition: color 0.3s ease;
 }
 
 .row-win {

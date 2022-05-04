@@ -317,17 +317,20 @@ const displayController = (() => {
     const thisBoard = gameBoard.getBoard();
     for (let i = 0; i < gameTiles.length; i++) {
       gameTiles[i].textContent = thisBoard[i];
-      if (gameTiles[i].textContent === 'X') {
-        gameTiles[i].classList.add('p1-mark');
-      } else if (gameTiles[i].textContent === 'O') {
-        gameTiles[i].classList.add('p2-mark');
+      if (gameTiles[i].textContent !== '') {
+        gameTiles[i].classList.remove('valid');
+        if (gameTiles[i].textContent === 'X') {
+          gameTiles[i].classList.add('p1-mark');
+        } else if (gameTiles[i].textContent === 'O') {
+          gameTiles[i].classList.add('p2-mark');
+        }
       }
     }
   }
   const resetBoard = () => {
     gameTiles.forEach(tile => {
       tile.addEventListener('click', getTile);
-      tile.className = 'game-tile'
+      tile.className = 'game-tile valid'
     })
   }
 
@@ -355,7 +358,10 @@ const displayController = (() => {
     }
   }
   const endGame = (player = {}) => {
-    gameTiles.forEach(tile => tile.removeEventListener('click', getTile));
+    gameTiles.forEach(tile => {
+      tile.removeEventListener('click', getTile);
+      tile.classList.remove('valid');
+    });
     restartButton.textContent = 'Play again';
     const isWin = Object.keys(player).length > 0;
 
